@@ -1,0 +1,59 @@
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.title {
+  font-size: 24px;
+}
+
+.keuringStatus {
+  font-size: 18px;
+  padding: 15px 25px;
+  color: white;
+  border-radius: 45px;
+}
+
+.klant,
+.adres {
+  display: flex;
+  align-items: center;
+  padding-top: 30px;
+  font-size: 18px;
+}
+
+.cardSubHeader:not(:first-child) {
+  margin-top: 40px;
+}
+
+.cardSubHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editIconContainer {
+  border-radius: 40px;
+  padding: 10px;
+}
+
+.editIconContainer:hover {
+  background-color: rgb(241, 243, 245);
+}
+
+.iconContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 25px;
+}
+
+.iconContainer p {
+  line-height: 30px;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 16px;
+}

@@ -1,0 +1,45 @@
+.title {
+  font-size: 24px;
+}
+
+.statusBgColor {
+  border-radius: 25px;
+  padding: 12px 20px;
+  color: white;
+}
+
+.bgRed {
+  background-color: red;
+}
+
+.statusDatumPlaatsbezoek {
+  margin-left: 15px;
+}
+
+.icon {
+  border-radius: 25px;
+}
+
+.icon:hover {
+  background-color: rgb(241, 243, 245);
+}
+
+.tableCell {
+  font-size: 16px;
+}
+
+.klant,
+.adres {
+  display: flex;
+  flex-direction: column;
+}
+
+.naam {
+  font-weight: bold;
+}
+
+.email,
+.gemeente {
+  margin-top: 3px;
+  font-size: 12px;
+}
