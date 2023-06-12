@@ -271,6 +271,13 @@ const Keuring = ({ params }) => {
               </Card.Body>
             </Card>
           </Grid>
+          <Grid xs={12}>
+            <Card css={{ padding: "15px 30px", backgroundColor: "red" }}>
+              <Card.Body>
+                <h2>TEST</h2>
+              </Card.Body>
+            </Card>
+          </Grid>
         </Grid.Container>
       </div>
     </main>

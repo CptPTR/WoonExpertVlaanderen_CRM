@@ -6,6 +6,8 @@
 
 .sidemenu {
   width: 275px;
+  height: 100vh;
+  position: fixed;
   display: flex;
   justify-content: space-between;
   flex-direction: column;

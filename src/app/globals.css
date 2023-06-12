@@ -87,7 +87,8 @@ body {
 
 main {
   width: 100%;
-  margin: 0 64px;
+  padding: 0 64px;
+  margin-left: 275px;
 }
 
 header {
