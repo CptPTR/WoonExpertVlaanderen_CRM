@@ -235,7 +235,7 @@ const Keuring = ({ params }) => {
             <Card css={{ padding: "15px 30px" }}>
               <Card.Body>
                 <h2>Extra documenten</h2>
-                {/* <ul>{keuring && <li>{keuring.id}</li>}</ul> */}
+                <Dropzone acceptFileType="images" multipleFiles />
               </Card.Body>
             </Card>
           </Grid>
@@ -250,13 +250,15 @@ const Keuring = ({ params }) => {
             <Card css={{ padding: "15px 30px 0 30px" }}>
               <Card.Body>
                 <h2>Toegang eenheid</h2>
-                <div className={styles.iconContainer}>
-                  {keuring &&
-                    (keuring.toegangEenheid == ToegangEenheid.KLANT ? (
-                      <FaHandshake size={64} />
-                    ) : (
-                      <GiHouseKeys size={64} />
-                    ))}
+                <div className={styles.content}>
+                  <div className={styles.icon}>
+                    {keuring &&
+                      (keuring.toegangEenheid == ToegangEenheid.KLANT ? (
+                        <FaHandshake size={64} />
+                      ) : (
+                        <GiHouseKeys size={64} />
+                      ))}
+                  </div>
                   <p>{keuring && keuring.toegangEenheid}</p>
                 </div>
               </Card.Body>
@@ -264,17 +266,10 @@ const Keuring = ({ params }) => {
           </Grid>
 
           <Grid xs={4}>
-            <Card css={{ padding: "15px 30px" }}>
+            <Card css={{ padding: "15px 30px 0 30px" }}>
               <Card.Body>
                 <h2>Energiecertificaat</h2>
-                <Dropzone />
-              </Card.Body>
-            </Card>
-          </Grid>
-          <Grid xs={12}>
-            <Card css={{ padding: "15px 30px", backgroundColor: "red" }}>
-              <Card.Body>
-                <h2>TEST</h2>
+                <Dropzone acceptFileType="pdf" />
               </Card.Body>
             </Card>
           </Grid>
