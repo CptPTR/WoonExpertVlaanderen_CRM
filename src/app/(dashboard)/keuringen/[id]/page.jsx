@@ -175,7 +175,7 @@ const Keuring = ({ params }) => {
         )}
 
         <Grid.Container gap={2} justify="center">
-          <Grid xs={5}>
+          <Grid xs={4}>
             <Card css={{ padding: "15px 30px" }}>
               <Card.Body>
                 <div className={styles.cardSubHeader}>
@@ -231,7 +231,14 @@ const Keuring = ({ params }) => {
               </Card.Body>
             </Card>
           </Grid>
-          <Grid xs={7}>
+          <Grid xs={4}>
+            <Card css={{ padding: "15px 30px" }}>
+              <Card.Body>
+                <h2>Facturatie</h2>
+              </Card.Body>
+            </Card>
+          </Grid>
+          <Grid xs={4}>
             <Card css={{ padding: "15px 30px" }}>
               <Card.Body>
                 <h2>Extra documenten</h2>
@@ -239,14 +246,14 @@ const Keuring = ({ params }) => {
               </Card.Body>
             </Card>
           </Grid>
-          <Grid xs={5}>
-            <Card css={{ padding: "15px 30px" }}>
+          <Grid xs={4}>
+            <Card css={{ padding: "15px 30px 0 30px" }}>
               <Card.Body>
-                <h2>Facturatie</h2>
+                <h2>Google Maps</h2>
               </Card.Body>
             </Card>
           </Grid>
-          <Grid xs={3}>
+          <Grid xs={4}>
             <Card css={{ padding: "15px 30px 0 30px" }}>
               <Card.Body>
                 <h2>Toegang eenheid</h2>
