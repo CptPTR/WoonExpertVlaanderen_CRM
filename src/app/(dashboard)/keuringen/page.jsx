@@ -35,6 +35,10 @@ const Keuringen = () => {
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -57,6 +61,10 @@ const Keuringen = () => {
         nummer: 52,
         gemeente: "Mechelen",
         postcode: 2800,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.ASBEST,
       status: Status.IN_BEHANDELING,
@@ -81,6 +89,10 @@ const Keuringen = () => {
         gemeente: "Mechelen",
         postcode: 2800,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC,
       status: Status.GEANNULEERD,
       energiedeskundige: "Danny",
@@ -103,6 +115,10 @@ const Keuringen = () => {
         nummer: 30,
         gemeente: "Mechelen",
         postcode: 2800,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.EPC_ASBEST,
       status: Status.CERTIFICAAT,
@@ -127,6 +143,10 @@ const Keuringen = () => {
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -149,6 +169,10 @@ const Keuringen = () => {
         nummer: 4,
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
@@ -173,6 +197,10 @@ const Keuringen = () => {
         gemeente: "Mechelen",
         postcode: 2800,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.ASBEST,
       status: Status.IN_BEHANDELING,
       energiedeskundige: "Bob",
@@ -195,6 +223,10 @@ const Keuringen = () => {
         nummer: 24,
         gemeente: "Mechelen",
         postcode: 2800,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.EPC,
       status: Status.GEANNULEERD,
@@ -219,6 +251,10 @@ const Keuringen = () => {
         gemeente: "Mechelen",
         postcode: 2800,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC_ASBEST,
       status: Status.CERTIFICAAT,
       energiedeskundige: "Danny",
@@ -241,6 +277,10 @@ const Keuringen = () => {
         nummer: 4,
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
@@ -265,6 +305,10 @@ const Keuringen = () => {
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -287,6 +331,10 @@ const Keuringen = () => {
         nummer: 4,
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
@@ -311,6 +359,10 @@ const Keuringen = () => {
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -334,6 +386,10 @@ const Keuringen = () => {
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
       },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
+      },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -356,6 +412,10 @@ const Keuringen = () => {
         nummer: 4,
         gemeente: "Sint-Katelijne-Waver",
         postcode: 2860,
+      },
+      immo: {
+        id: 1,
+        naam: "Vastgoed Heylen",
       },
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
@@ -438,6 +498,7 @@ const Keuringen = () => {
               >
                 DATUM TOEWIJZING
               </Table.Column>
+              <Table.Column css={{ fontSize: "16px" }}>IMMO</Table.Column>
               <Table.Column css={{ fontSize: "16px" }}>KLANT</Table.Column>
               <Table.Column css={{ fontSize: "16px" }}>ADRES</Table.Column>
               <Table.Column css={{ fontSize: "16px" }}>
@@ -451,6 +512,9 @@ const Keuringen = () => {
                 <Table.Row key={keuring.id}>
                   <Table.Cell css={styles.tableCell}>
                     {formatDate(keuring.datumToewijzing)}
+                  </Table.Cell>
+                  <Table.Cell css={styles.tableCell}>
+                    {keuring.immo.naam}
                   </Table.Cell>
                   <Table.Cell css={styles.tableCell}>
                     <div className={styles.klant}>
