@@ -437,7 +437,7 @@ const Keuringen = () => {
   };
 
   const getBackgroundStatusColor = (index) => {
-    switch (keuringen[index].status) {
+    switch (filteredKeuringen[index].status) {
       case Status.GEANNULEERD:
         return "rgba(244, 67, 54, 0.7)";
       case Status.IN_BEHANDELING:
