@@ -3,15 +3,34 @@
 import { Roboto } from "next/font/google";
 
 import styles from "@/app/(dashboard)/keuringen/keuringen.module.css";
-import { Input, Table } from "@nextui-org/react";
-import TypeKeuring from "@/models/TypeKeuring";
+
 import Status from "@/models/Status";
-import { MdKeyboardArrowRight } from "react-icons/md";
-import Link from "next/link";
-import { useState } from "react";
+import TypeKeuring from "@/models/TypeKeuring";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 import KeuringNietGevonden from "@/assets/images/keuring_niet_gevonden.png";
+import ToegangEenheid from "@/models/ToegangEenheid";
+import {
+  Button,
+  ButtonGroup,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+import { FaSearch } from "react-icons/fa";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
@@ -39,6 +58,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -66,6 +87,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.ASBEST,
       status: Status.IN_BEHANDELING,
       energiedeskundige: "Bob",
@@ -93,6 +116,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
       type: TypeKeuring.EPC,
       status: Status.GEANNULEERD,
       energiedeskundige: "Danny",
@@ -120,6 +145,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC_ASBEST,
       status: Status.CERTIFICAAT,
       energiedeskundige: "Danny",
@@ -147,6 +174,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -174,6 +203,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -201,6 +232,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
       type: TypeKeuring.ASBEST,
       status: Status.IN_BEHANDELING,
       energiedeskundige: "Bob",
@@ -228,6 +261,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.GEANNULEERD,
       energiedeskundige: "Danny",
@@ -255,6 +290,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
       type: TypeKeuring.EPC_ASBEST,
       status: Status.CERTIFICAAT,
       energiedeskundige: "Danny",
@@ -282,6 +319,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -309,6 +348,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -336,6 +377,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -363,6 +406,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -390,6 +435,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -417,6 +464,8 @@ const Keuringen = () => {
         id: 1,
         naam: "Vastgoed Heylen",
       },
+      opmerking: "",
+      toegangEenheid: ToegangEenheid.KLANT,
       type: TypeKeuring.EPC,
       status: Status.INGEPLAND,
       energiedeskundige: "Bob",
@@ -426,6 +475,30 @@ const Keuringen = () => {
   const [zoekKeuring, setZoekKeuring] = useState("");
   const [filteredKeuringen, setFilteredKeuringen] = useState(keuringen);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(filteredKeuringen.length);
+  const itemsPerPage = 8;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = filteredKeuringen.slice(startIndex, endIndex);
+
+  const router = useRouter();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const getSess = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+      }
+    };
+    getSess();
+  }, [router, supabase.auth]);
+
   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -434,6 +507,12 @@ const Keuringen = () => {
     const amOrPm = hours >= 12 ? "PM" : "AM";
 
     return `${day}/${month}/${year} ${amOrPm}`;
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const getBackgroundStatusColor = (index) => {
@@ -473,114 +552,145 @@ const Keuringen = () => {
           <h1 className={`${roboto900.className} ${styles.title}`}>
             KEURINGEN
           </h1>
-          <Input
-            bordered
-            clearable
-            placeholder="Zoek..."
-            value={zoekKeuring}
-            onChange={handleZoekKeuringChange}
-            css={{
-              alignSelf: "flex-end",
-              marginBottom: "10px",
-            }}
-            className={styles.search}
-          />
+          <InputGroup className={styles.search} width={500}>
+            <InputLeftElement pointerEvents="none">
+              <FaSearch />
+            </InputLeftElement>
+            <Input
+              placeholder="Zoek..."
+              value={zoekKeuring}
+              onChange={handleZoekKeuringChange}
+            />
+          </InputGroup>
         </header>
 
         {filteredKeuringen.length > 0 ? (
-          <Table aria-label="keuringentabel" bgcolor="white">
-            <Table.Header>
-              <Table.Column
-                css={{
-                  fontSize: "16px",
-                  padding: "15px 0",
-                }}
-              >
-                DATUM TOEWIJZING
-              </Table.Column>
-              <Table.Column css={{ fontSize: "16px" }}>IMMO</Table.Column>
-              <Table.Column css={{ fontSize: "16px" }}>KLANT</Table.Column>
-              <Table.Column css={{ fontSize: "16px" }}>ADRES</Table.Column>
-              <Table.Column css={{ fontSize: "16px" }}>
-                TYPE KEURING
-              </Table.Column>
-              <Table.Column css={{ fontSize: "16px" }}>STATUS</Table.Column>
-              <Table.Column></Table.Column>
-            </Table.Header>
-            <Table.Body>
-              {filteredKeuringen.map((keuring, index) => (
-                <Table.Row key={keuring.id}>
-                  <Table.Cell css={styles.tableCell}>
-                    {formatDate(keuring.datumToewijzing)}
-                  </Table.Cell>
-                  <Table.Cell css={styles.tableCell}>
-                    {keuring.immo.naam}
-                  </Table.Cell>
-                  <Table.Cell css={styles.tableCell}>
-                    <div className={styles.klant}>
-                      <span className={styles.naam}>
-                        {keuring.klant.voornaam +
-                          " " +
-                          keuring.klant.achternaam}
-                      </span>
-                      <span className={styles.email}>
-                        {keuring.klant.email}
-                      </span>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell css={styles.tableCell}>
-                    <div className={styles.adres}>
-                      <span className={styles.straat}>
-                        {keuring.adres.straat + " " + keuring.adres.nummer}
-                      </span>
-                      <span className={styles.gemeente}>
-                        {keuring.adres.gemeente}
-                      </span>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell css={styles.tableCell}>{keuring.type}</Table.Cell>
-                  <Table.Cell
-                    css={{
-                      fontSize: "16px",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div
-                      className={styles.statusBgColor}
-                      style={{
-                        backgroundColor: getBackgroundStatusColor(index),
+          <div>
+            <TableContainer
+              css={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                backgroundColor: "white",
+                padding: "0 20px 20px 20px",
+                boxShadow: "0 12px 20px 6px rgb(104 112 118 / 0.08)",
+              }}
+            >
+              <Table variant="simple" css={{ width: "100%" }}>
+                <Thead>
+                  <Tr className={styles.tableColumn}>
+                    <Th
+                      css={{
+                        padding: "20px 0",
                       }}
                     >
-                      {keuring.status +
-                        (keuring.status == Status.INGEPLAND
-                          ? " -> " + formatDate(keuring.datumPlaatsbezoek)
-                          : "")}
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Link href={`/keuringen/${keuring.id}`}>
-                      <MdKeyboardArrowRight
-                        className={styles.icon}
-                        onClick={() => {
-                          console.log(keuring.klant.voornaam);
-                        }}
-                        size={32}
-                      />
-                    </Link>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-            <Table.Pagination
-              size={"md"}
-              shadow
-              loop
-              rowsPerPage={10}
-              align="center"
-              color={"gradient"}
-            />
-          </Table>
+                      DATUM <br />
+                      TOEWIJZING
+                    </Th>
+                    <Th>IMMO</Th>
+                    <Th>KLANT</Th>
+                    <Th>ADRES</Th>
+                    <Th>TYPE</Th>
+                    <Th>STATUS</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {currentItems.map((keuring, index) => {
+                    return (
+                      <Tr key={keuring.id}>
+                        <Td css={{ padding: "25px 0" }}>
+                          {formatDate(keuring.datumToewijzing)}
+                        </Td>
+                        <Td>{keuring.immo.naam}</Td>
+                        <Td>
+                          <div className={styles.klant}>
+                            <span className={styles.naam}>
+                              {keuring.klant.voornaam +
+                                " " +
+                                keuring.klant.achternaam}
+                            </span>
+                            <span className={styles.email}>
+                              {keuring.klant.email}
+                            </span>
+                          </div>
+                        </Td>
+                        <Td>
+                          <div className={styles.adres}>
+                            <span className={styles.straat}>
+                              {keuring.adres.straat +
+                                " " +
+                                keuring.adres.nummer}
+                            </span>
+                            <span className={styles.gemeente}>
+                              {keuring.adres.gemeente}
+                            </span>
+                          </div>
+                        </Td>
+                        <Td>{keuring.type}</Td>
+                        <Td>
+                          <div
+                            className={styles.statusBgColor}
+                            style={{
+                              backgroundColor: getBackgroundStatusColor(index),
+                            }}
+                          >
+                            {keuring.status +
+                              (keuring.status == Status.INGEPLAND
+                                ? " -> " + formatDate(keuring.datumPlaatsbezoek)
+                                : "")}
+                          </div>
+                        </Td>
+                        <Td>
+                          <Link href={`/keuringen/${keuring.id}`}>
+                            <MdKeyboardArrowRight
+                              className={styles.icon}
+                              onClick={() => {
+                                console.log(keuring.klant.voornaam);
+                              }}
+                              size={32}
+                            />
+                          </Link>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              </Table>
+              <ButtonGroup css={{ marginTop: "20px" }}>
+                <Button
+                  className={styles.paginationButton}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  isDisabled={currentPage === 1}
+                >
+                  <MdKeyboardArrowLeft />
+                </Button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <Button
+                    key={index}
+                    className={styles.paginationButton}
+                    onClick={() => handlePageChange(index + 1)}
+                    style={{
+                      color: currentPage === index + 1 ? "white" : "",
+                      background:
+                        currentPage === index + 1
+                          ? "linear-gradient(to top, #11998e, #38ef7d)"
+                          : "",
+                    }}
+                  >
+                    {index + 1}
+                  </Button>
+                ))}
+                <Button
+                  className={styles.paginationButton}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  isDisabled={currentPage === totalPages}
+                >
+                  <MdKeyboardArrowRight />
+                </Button>
+              </ButtonGroup>
+            </TableContainer>
+          </div>
         ) : (
           <div className={styles.geenKeuringen}>
             <Image

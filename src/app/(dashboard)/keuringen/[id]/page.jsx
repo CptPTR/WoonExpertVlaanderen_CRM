@@ -1,29 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Roboto } from "next/font/google";
-import { Card, Grid } from "@nextui-org/react";
-import {
-  MdPerson,
-  MdAlternateEmail,
-  MdPhone,
-  MdLocationCity,
-  MdHome,
-  MdEdit,
-} from "react-icons/md";
-import { GiHouseKeys } from "react-icons/gi";
+import { useCallback, useEffect, useState } from "react";
 import { FaHandshake } from "react-icons/fa";
+import { GiHouseKeys } from "react-icons/gi";
+import {
+  MdAlternateEmail,
+  MdDelete,
+  MdDownload,
+  MdEdit,
+  MdHome,
+  MdLocationCity,
+  MdPerson,
+  MdPhone,
+} from "react-icons/md";
 
-import Status from "@/models/Status";
-import TypeKeuring from "@/models/TypeKeuring";
-import ToegangEenheid from "@/models/ToegangEenheid";
 import Dropzone from "@/components/Dropzone";
+import Status from "@/models/Status";
+import ToegangEenheid from "@/models/ToegangEenheid";
+import TypeKeuring from "@/models/TypeKeuring";
 
 import styles from "@/app/(dashboard)/keuringen/[id]/keuring.module.css";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Grid,
+  GridItem,
+  Heading,
+  Input,
+  Tag,
+  TagLabel,
+  Text,
+  Textarea,
+  Tooltip,
+  List,
+  ListItem,
+} from "@chakra-ui/react";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
 const Keuring = ({ params }) => {
+  const [editMode, setEditMode] = useState(false);
   const [keuring, setKeuring] = useState(null);
 
   useEffect(() => {
@@ -50,6 +68,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -77,6 +97,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.ASBEST,
         status: Status.IN_BEHANDELING,
         energiedeskundige: "Bob",
@@ -104,6 +126,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
         type: TypeKeuring.EPC,
         status: Status.GEANNULEERD,
         energiedeskundige: "Danny",
@@ -131,6 +155,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC_ASBEST,
         status: Status.CERTIFICAAT,
         energiedeskundige: "Danny",
@@ -158,6 +184,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -185,6 +213,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -212,6 +242,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
         type: TypeKeuring.ASBEST,
         status: Status.IN_BEHANDELING,
         energiedeskundige: "Bob",
@@ -239,6 +271,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.GEANNULEERD,
         energiedeskundige: "Danny",
@@ -266,6 +300,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
         type: TypeKeuring.EPC_ASBEST,
         status: Status.CERTIFICAAT,
         energiedeskundige: "Danny",
@@ -293,6 +329,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -320,6 +358,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -347,6 +387,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -374,6 +416,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -401,6 +445,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -428,6 +474,8 @@ const Keuring = ({ params }) => {
           id: 1,
           naam: "Vastgoed Heylen",
         },
+        extraDocumenten: [],
+        toegangEenheid: ToegangEenheid.KLANT,
         type: TypeKeuring.EPC,
         status: Status.INGEPLAND,
         energiedeskundige: "Bob",
@@ -461,111 +509,344 @@ const Keuring = ({ params }) => {
     return `${day}/${month}/${year} ${amOrPm}`;
   };
 
+  const removeFiles = (from) => {
+    if (from == "extradocs") {
+      setKeuring((previousKeuring) => ({
+        ...previousKeuring,
+        extraDocumenten: [],
+      }));
+    } else {
+      setKeuring((previousKeuring) => ({
+        ...previousKeuring,
+        certificaat: {},
+      }));
+    }
+  };
+
   return (
     <main>
       <div>
         {keuring && (
           <header>
             <h1 className={`${roboto900.className} ${styles.title}`}>
-              KEURING
+              KEURING - {keuring.type}
             </h1>
-            <div
+            <Tag
+              size="lg"
               className={styles.keuringStatus}
-              style={{
-                backgroundColor: getBackgroundStatusColor(keuring.status),
-              }}
+              variant="solid"
+              bgColor={getBackgroundStatusColor(keuring.status)}
+              color="white"
             >
-              {keuring.status +
-                (keuring.status == Status.INGEPLAND
-                  ? " -> " + formatDate(keuring.datumPlaatsbezoek)
-                  : "")}
-            </div>
+              <TagLabel>
+                {keuring.status +
+                  (keuring.status == Status.INGEPLAND
+                    ? " -> " + formatDate(keuring.datumPlaatsbezoek)
+                    : "")}
+              </TagLabel>
+            </Tag>
           </header>
         )}
-
-        <Grid.Container gap={2} justify="center">
-          <Grid xs={4}>
-            <Card css={{ padding: "15px 30px" }}>
-              <Card.Body>
-                <div className={styles.cardSubHeader}>
-                  <h2>Klant</h2>
-                  <div className={styles.editIconContainer}>
-                    <MdEdit className={styles.editIcon} size={24} />
-                  </div>
+        {/* {JSON.stringify(keuring)} */}
+        <Grid
+          h="750px"
+          templateRows="repeat(12, 1fr)"
+          templateColumns="repeat(12, 1fr)"
+          gap={30}
+        >
+          <GridItem
+            rowSpan={7}
+            colSpan={4}
+            bg="white"
+            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+            position={"relative"}
+          >
+            <Card padding="16px 24px" height="100%">
+              <div className={styles.editIconsContainer}>
+                <div
+                  className={styles.editIconContainer}
+                  onClick={() => setEditMode(!editMode)}
+                >
+                  <MdEdit className={styles.editIcon} size={24} />
                 </div>
-                <ul>
+              </div>
+              <CardHeader padding="20px 20px 10px 20px">
+                <Heading size="md">Klant</Heading>
+              </CardHeader>
+              <CardBody>
+                <List>
                   {keuring && (
                     <>
-                      <li className={styles.klant}>
+                      <ListItem className={styles.klant}>
                         <MdPerson size={24} style={{ margin: "0 20px" }} />
-                        {`${keuring.klant.voornaam} ${keuring.klant.achternaam}`}
-                      </li>
-                      <li className={styles.klant}>
+                        {editMode ? (
+                          <>
+                            <Input
+                              width="150px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.klant.voornaam}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  klant: {
+                                    ...keuring.klant,
+                                    voornaam: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                            <Input
+                              width="175px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.klant.achternaam}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  klant: {
+                                    ...keuring.klant,
+                                    achternaam: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                          </>
+                        ) : (
+                          <Text>
+                            {keuring.klant?.voornaam +
+                              " " +
+                              keuring.klant?.achternaam}
+                          </Text>
+                        )}
+                      </ListItem>
+                      <ListItem className={styles.klant}>
                         <MdAlternateEmail
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        {keuring.klant.email}
-                      </li>
-                      <li className={styles.klant}>
+                        {editMode ? (
+                          <>
+                            <Input
+                              type="email"
+                              width="325px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.klant.email}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  klant: {
+                                    ...keuring.klant,
+                                    email: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                          </>
+                        ) : (
+                          <Text>{keuring.klant?.email}</Text>
+                        )}
+                      </ListItem>
+                      <ListItem className={styles.klant}>
                         <MdPhone size={24} style={{ margin: "0 20px" }} />
-                        {keuring.klant.telefoonnummer}
-                      </li>
+                        {editMode ? (
+                          <>
+                            <Input
+                              type="tel"
+                              width="325px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.klant.telefoonnummer}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  klant: {
+                                    ...keuring.klant,
+                                    telefoonnummer: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                          </>
+                        ) : (
+                          <Text>{keuring.klant?.telefoonnummer}</Text>
+                        )}
+                      </ListItem>
                     </>
                   )}
-                </ul>
-                <div className={styles.cardSubHeader}>
-                  <h2>Adres</h2>
-                  <div className={styles.editIconContainer}>
-                    <MdEdit className={styles.editIcon} size={24} />
-                  </div>
-                </div>
-                <ul>
+                </List>
+              </CardBody>
+              <CardHeader padding="20px 20px 10px 20px">
+                <Heading size="md">Adres</Heading>
+              </CardHeader>
+              <CardBody>
+                <List>
                   {keuring && (
                     <>
-                      <li className={styles.adres}>
+                      <ListItem className={styles.adres}>
                         <MdHome size={24} style={{ margin: "0 20px" }} />
-                        {`${keuring.adres.straat} ${keuring.adres.nummer}`}
-                      </li>
-                      <li className={styles.adres}>
+                        {editMode ? (
+                          <>
+                            <Input
+                              type="text"
+                              width="250px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.adres.straat}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  adres: {
+                                    ...keuring.adres,
+                                    straat: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                            <Input
+                              type="number"
+                              width="75px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.adres.nummer}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  adres: {
+                                    ...keuring.adres,
+                                    nummer: +e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                          </>
+                        ) : (
+                          <Text>
+                            {keuring.adres?.straat +
+                              " " +
+                              keuring.adres?.nummer}
+                          </Text>
+                        )}
+                      </ListItem>
+                      <ListItem className={styles.adres}>
                         <MdLocationCity
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        {`${keuring.adres.postcode} ${keuring.adres.gemeente}`}
-                      </li>
+                        {editMode ? (
+                          <>
+                            <Input
+                              type="number"
+                              width="100px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.adres.postcode}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  adres: {
+                                    ...keuring.adres,
+                                    postcode: +e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                            <Input
+                              width="225px"
+                              height="27px"
+                              fontSize="18px"
+                              defaultValue={keuring.adres.gemeente}
+                              onBlur={(e) =>
+                                setKeuring({
+                                  ...keuring,
+                                  adres: {
+                                    ...keuring.adres,
+                                    gemeente: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                          </>
+                        ) : (
+                          <Text>
+                            {keuring.adres?.postcode +
+                              " " +
+                              keuring.adres?.gemeente}
+                          </Text>
+                        )}
+                      </ListItem>
                     </>
                   )}
-                </ul>
-              </Card.Body>
+                </List>
+              </CardBody>
             </Card>
-          </Grid>
-          <Grid xs={4}>
-            <Card css={{ padding: "15px 30px" }}>
-              <Card.Body>
-                <h2>Facturatie</h2>
-              </Card.Body>
+          </GridItem>
+          <GridItem
+            rowSpan={7}
+            colSpan={4}
+            bg="white"
+            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+          >
+            <Card padding="16px 24px" height="100%">
+              <CardHeader padding="20px 20px 10px 20px">
+                <Heading size="md">Facturatie</Heading>
+              </CardHeader>
             </Card>
-          </Grid>
-          <Grid xs={4}>
-            <Card css={{ padding: "15px 30px" }}>
-              <Card.Body>
-                <h2>Extra documenten</h2>
-                <Dropzone acceptFileType="images" multipleFiles />
-              </Card.Body>
+          </GridItem>
+          <GridItem
+            rowSpan={7}
+            colSpan={4}
+            bg="white"
+            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+          >
+            <Card height="100%">
+              <div className={styles.editIconsContainer}>
+                <Tooltip
+                  label="Download alle documenten"
+                  placement="bottom-end"
+                >
+                  <div className={styles.editIconContainer}>
+                    <MdDownload size={24} />
+                  </div>
+                </Tooltip>
+                <Tooltip
+                  label="Verwijder alle documenten"
+                  placement="bottom-end"
+                >
+                  <div
+                    className={styles.editIconContainer}
+                    onClick={() => removeFiles("extradocs")}
+                  >
+                    <MdDelete className={styles.editIcon} size={24} />
+                  </div>
+                </Tooltip>
+              </div>
+              <CardHeader padding="36px 44px">
+                <Heading size="md">Extra documenten</Heading>
+              </CardHeader>
+              <Dropzone
+                keuring={keuring}
+                setKeuring={setKeuring}
+                forFiles="extradocs"
+                acceptFileType="images"
+                multipleFiles
+                text="Sleep hier afbeeldingen/PDF-bestanden naartoe, of klik om ze te selecteren."
+              />
             </Card>
-          </Grid>
-          <Grid xs={4}>
-            <Card css={{ padding: "15px 30px 0 30px" }}>
-              <Card.Body>
-                <h2>Google Maps</h2>
-              </Card.Body>
-            </Card>
-          </Grid>
-          <Grid xs={4}>
-            <Card css={{ padding: "15px 30px 0 30px" }}>
-              <Card.Body>
-                <h2>Toegang eenheid</h2>
+          </GridItem>
+
+          <GridItem
+            rowSpan={5}
+            colSpan={3}
+            bg="white"
+            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+          >
+            <Card padding="16px 24px" height="100%">
+              <CardHeader padding="20px 20px 10px 20px">
+                <Heading size="md">Toegang eenheid</Heading>
+              </CardHeader>
+              <CardBody>
                 <div className={styles.content}>
                   <div className={styles.icon}>
                     {keuring &&
@@ -575,21 +856,77 @@ const Keuring = ({ params }) => {
                         <GiHouseKeys size={64} />
                       ))}
                   </div>
+
                   <p>{keuring && keuring.toegangEenheid}</p>
                 </div>
-              </Card.Body>
+              </CardBody>
             </Card>
-          </Grid>
-
-          <Grid xs={4}>
-            <Card css={{ padding: "15px 30px 0 30px" }}>
-              <Card.Body>
-                <h2>Energiecertificaat</h2>
-                <Dropzone acceptFileType="pdf" />
-              </Card.Body>
+          </GridItem>
+          <GridItem
+            rowSpan={5}
+            colSpan={5}
+            bg="white"
+            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+          >
+            <Card padding="16px 24px" height="100%">
+              <CardHeader padding="20px 20px 10px 20px">
+                <Heading size="md">Extra opmerkingen</Heading>
+              </CardHeader>
+              <CardBody height={"100%"}>
+                <Textarea
+                  defaultValue={keuring && keuring.opmerking}
+                  width="100%"
+                  height="100px"
+                  fontSize="16px"
+                  padding="10px"
+                  resize="none"
+                  borderRadius="5px"
+                  borderColor="blackAlpha.500"
+                  onBlur={useCallback(
+                    (e) => {
+                      setKeuring({ ...keuring, opmerking: e.target.value });
+                    },
+                    [keuring]
+                  )}
+                />
+              </CardBody>
             </Card>
-          </Grid>
-        </Grid.Container>
+          </GridItem>
+          <GridItem
+            rowSpan={5}
+            colSpan={4}
+            bg="white"
+            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+          >
+            <Card padding="16px 24px" height="100%">
+              <div className={styles.editIconsContainer}>
+                <Tooltip label="Download certificaat" placement="bottom-end">
+                  <div className={styles.editIconContainer}>
+                    <MdDownload size={24} />
+                  </div>
+                </Tooltip>
+                <Tooltip label="Verwijder certificaat" placement="bottom-end">
+                  <div
+                    className={styles.editIconContainer}
+                    onClick={() => removeFiles("certificaat")}
+                  >
+                    <MdDelete className={styles.editIcon} size={24} />
+                  </div>
+                </Tooltip>
+              </div>
+              <CardHeader padding="20px 20px 10px 20px">
+                <Heading size="md">Energiecertificaat</Heading>
+              </CardHeader>
+              <Dropzone
+                keuring={keuring}
+                setKeuring={setKeuring}
+                forFiles="certificaat"
+                acceptFileType="pdf"
+                text="Sleep hier een PDF-bestand naartoe, of klik om een bestand te selecteren"
+              />
+            </Card>
+          </GridItem>
+        </Grid>
       </div>
     </main>
   );

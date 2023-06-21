@@ -9,10 +9,13 @@
   font-size: 24px;
 }
 
+.klantSubHeading {
+  padding-top: 20px;
+}
+
 .keuringStatus {
   font-size: 18px;
   padding: 15px 25px;
-  color: white;
   border-radius: 45px;
 }
 
@@ -20,7 +23,8 @@
 .adres {
   display: flex;
   align-items: center;
-  padding-top: 30px;
+  padding-top: 0;
+  padding-bottom: 15px;
   font-size: 18px;
 }
 
@@ -32,15 +36,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.editIconContainer {
-  border-radius: 40px;
-  padding: 10px;
-}
-
-.editIconContainer:hover {
-  background-color: rgb(241, 243, 245);
 }
 
 .content {
@@ -62,4 +57,23 @@
 
 .content p {
   text-align: center;
+}
+
+.editIconsContainer {
+  position: absolute;
+  top: 26px;
+  right: 34px;
+  display: flex;
+}
+
+.editIconContainer {
+  display: flex;
+  align-items: center;
+  border-radius: 40px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.editIconContainer:hover {
+  background-color: rgb(241, 243, 245);
 }

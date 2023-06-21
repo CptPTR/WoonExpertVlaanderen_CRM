@@ -2,16 +2,25 @@
   font-size: 24px;
 }
 
-.search input {
-  padding-right: 25px;
+.search {
+  align-self: flex-end;
+  margin-bottom: 10px;
 }
 
-.search button {
-  margin-right: 10px;
+.tableColumn {
+  text-align: left;
+}
+
+.tableColumn > * {
+  border-bottom: solid 3px rgb(241, 243, 245);
 }
 
 .geenKeuringen {
   text-align: center;
+}
+
+.geenKeuringen img {
+  margin: 0 auto;
 }
 
 .geenKeuringen p {
@@ -19,6 +28,7 @@
 }
 
 .statusBgColor {
+  display: inline-flex;
   border-radius: 25px;
   padding: 12px 20px;
   color: white;
@@ -40,10 +50,6 @@
   background-color: rgb(241, 243, 245);
 }
 
-.tableCell {
-  font-size: 16px;
-}
-
 .klant,
 .adres {
   display: flex;
@@ -58,4 +64,13 @@
 .gemeente {
   margin-top: 3px;
   font-size: 12px;
+}
+
+.paginationButton {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
 }
