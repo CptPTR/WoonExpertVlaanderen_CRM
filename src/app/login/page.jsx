@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import styles from "@/app/login/login.module.css";
 import Logo from "@/assets/images/wev_logo.png";
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
@@ -94,56 +95,11 @@ export default function Login() {
         >
           Aanmelden
         </Button>
-        <Text mt={5}>Wachtwoord vergeten?</Text>
-        <Link href="/reset-password">Klik hier om het te resetten</Link>
+        <Box textAlign="center">
+          <Text mt={5}>Wachtwoord vergeten?</Text>
+          <Link href="/reset-password">Klik hier om het te resetten</Link>
+        </Box>
       </form>
     </div>
   );
 }
-
-// const Login = () => {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [passwordHidden, setPasswordHidden] = useState(true);
-
-//   const handleLogin = (e) => {
-//     e.preventDefault();
-//   };
-
-//   return (
-//     <div className={styles.login}>
-//       <Image height={100} src={Logo} alt="Logo WoonExpertVlaanderen" priority />
-//       <form>
-//         <FormControl mt="50px" fontSize="14px" fontWeight="500">
-//           <FormLabel>E-mail</FormLabel>
-//           <Input
-//             mt="5px"
-//             type="email"
-//             onChange={(e) => setEmail(e.target.value)}
-//           />
-//         </FormControl>
-//         <FormControl mt="20px" fontSize="14px" fontWeight="500">
-//           <FormLabel>Wachtwoord</FormLabel>
-//           <InputGroup mt="5px">
-//             <Input
-//               type={passwordHidden ? "password" : "text"}
-//               pr="4.5rem"
-//               onChange={(e) => setPassword(e.target.value)}
-//             />
-//             <InputRightElement>
-//               <IconButton
-//                 height="1.75rem"
-//                 size="sm"
-//                 icon={passwordHidden ? <FaEyeSlash /> : <FaEye />}
-//                 onClick={() => setPasswordHidden(!passwordHidden)}
-//               />
-//             </InputRightElement>
-//           </InputGroup>
-//         </FormControl>
-//         <LoginButton />
-//         <Text mt={5}>Wachtwoord vergeten?</Text>
-//         <Link href="/reset-password">Klik hier om het te resetten</Link>
-//       </form>
-//     </div>
-//   );
-// };
