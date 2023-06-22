@@ -37,7 +37,7 @@ export default function Login() {
       password,
     });
     if (error) {
-      console.log({ data, error });
+      console.log(error);
     } else {
       router.push("/keuringen");
     }

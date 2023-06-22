@@ -529,7 +529,6 @@ const Keuringen = () => {
 
   const handleZoekKeuringChange = (event) => {
     const { value } = event.target;
-    console.log(value);
     setZoekKeuring(value);
 
     const filteredData = value
@@ -642,15 +641,14 @@ const Keuringen = () => {
                           </div>
                         </Td>
                         <Td>
-                          <Link href={`/keuringen/${keuring.id}`}>
-                            <MdKeyboardArrowRight
-                              className={styles.icon}
-                              onClick={() => {
-                                console.log(keuring.klant.voornaam);
-                              }}
-                              size={32}
-                            />
-                          </Link>
+                          <MdKeyboardArrowRight
+                            cursor="pointer"
+                            className={styles.icon}
+                            onClick={() => {
+                              router.push(`/keuringen/${keuring.id}`);
+                            }}
+                            size={32}
+                          />
                         </Td>
                       </Tr>
                     );
