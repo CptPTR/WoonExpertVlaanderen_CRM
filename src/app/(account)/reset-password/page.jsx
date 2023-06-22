@@ -2,13 +2,18 @@
 
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  AlertTitle,
   Box,
   Button,
+  ChakraProvider,
+  CloseButton,
   FormControl,
   FormLabel,
   Heading,
   Input,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
@@ -17,6 +22,7 @@ const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const { isOpen: isVisible, onClose } = useDisclosure();
 
   const supabase = createClientComponentClient({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -26,7 +32,7 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/update-password",
+      redirectTo: `${location.origin}/update-password`,
     });
     if (error) {
       setErrorMessage(error.message);
@@ -38,7 +44,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <Box maxW="sm" mx="auto" mt={8} p={4}>
+    <Box maxW="lg" mx="auto" mt={8} p={4}>
       <Heading size="lg" mb={4}>
         Reset Password
       </Heading>
@@ -55,16 +61,23 @@ const ResetPassword = () => {
           Reset Wachtwoord
         </Button>
       </form>
+
       {successMessage && (
-        <Alert status="success" mt={4}>
+        <Alert status="success" variant="subtle" alignItems="flex-start" mt={5}>
           <AlertIcon />
-          {successMessage}
+          <Box flexDirection="column">
+            <AlertTitle>Aanvraag wachtwoord resetten succesvol</AlertTitle>
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Box>
         </Alert>
       )}
       {errorMessage && (
-        <Alert status="error" mt={4}>
+        <Alert status="error" variant="subtle" alignItems="flex-start" mt={5}>
           <AlertIcon />
-          {errorMessage}
+          <Box flexDirection="column">
+            <AlertTitle>Er is iets misgegaan.</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Box>
         </Alert>
       )}
     </Box>

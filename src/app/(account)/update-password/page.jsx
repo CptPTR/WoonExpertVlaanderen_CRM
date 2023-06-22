@@ -2,7 +2,9 @@
 
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  AlertTitle,
   Box,
   Button,
   FormControl,
@@ -25,11 +27,18 @@ const UpdatePassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await supabase.auth.updateUser({ password: password });
+    const { error } = await supabase.auth.updateUser({ password: password });
+    if (error) {
+      setErrorMessage(error.message);
+    } else {
+      setSuccessMessage(
+        "Ga terug naar de loginpagina en gebruik uw nieuwe wachtwoord om in te loggen."
+      );
+    }
   };
 
   return (
-    <Box maxW="sm" mx="auto" mt={8} p={4}>
+    <Box maxW="lg" mx="auto" mt={8} p={4}>
       <Heading size="lg" mb={4}>
         Update Uw Wachtwoord
       </Heading>
@@ -47,15 +56,21 @@ const UpdatePassword = () => {
         </Button>
       </form>
       {successMessage && (
-        <Alert status="success" mt={4}>
+        <Alert status="success" variant="solid" alignItems="flex-start" mt={5}>
           <AlertIcon />
-          {successMessage}
+          <Box flexDirection="column">
+            <AlertTitle>Wachtwoord succesvol geupdated.</AlertTitle>
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Box>
         </Alert>
       )}
       {errorMessage && (
-        <Alert status="error" mt={4}>
+        <Alert status="error" variant="solid" alignItems="flex-start" mt={5}>
           <AlertIcon />
-          {errorMessage}
+          <Box flexDirection="column">
+            <AlertTitle>Er is iets misgegaan.</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Box>
         </Alert>
       )}
     </Box>
