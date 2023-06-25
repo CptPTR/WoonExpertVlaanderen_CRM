@@ -5,22 +5,22 @@ import Image from "next/image";
 
 import Logo from "@/assets/images/wev_logo.png";
 import { Avatar, Button } from "@chakra-ui/react";
-import { Roboto } from "next/font/google";
-import { FaClipboardCheck } from "react-icons/fa";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Roboto } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FaClipboardCheck } from "react-icons/fa";
 
 const roboto400 = Roboto({ subsets: ["latin"], weight: "400" });
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
 export default function DashboardLayout({ children }) {
+  const router = useRouter();
   const supabase = createClientComponentClient({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   });
 
-  const router = useRouter();
   const [user, setUser] = useState({});
 
   const handleBtnClick = async (e) => {
@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }) {
     if (error) {
       console.log(error);
     } else {
-      router.push("/login");
+      window.location.href = "/login";
     }
   };
 
@@ -38,17 +38,19 @@ export default function DashboardLayout({ children }) {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const { data: user } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", session?.user.id)
-        .single();
-      setUser({
-        voornaam: user.voornaam,
-        achternaam: user.achternaam,
-        email: user.email,
-        rol: user.rol,
-      });
+      if (session) {
+        const { data: user } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        setUser({
+          voornaam: user.voornaam,
+          achternaam: user.achternaam,
+          email: user.email,
+          rol: user.rol,
+        });
+      }
     };
     getCurrentUser();
   }, [supabase]);

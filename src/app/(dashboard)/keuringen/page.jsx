@@ -8,15 +8,20 @@ import Status from "@/models/Status";
 import TypeKeuring from "@/models/TypeKeuring";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { useState } from "react";
+import {
+  MdAdd,
+  MdKeyboardArrowLeft,
+  MdKeyboardArrowRight,
+} from "react-icons/md";
 
 import KeuringNietGevonden from "@/assets/images/keuring_niet_gevonden.png";
 import ToegangEenheid from "@/models/ToegangEenheid";
 import {
+  Box,
   Button,
   ButtonGroup,
+  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -26,11 +31,11 @@ import {
   Td,
   Th,
   Thead,
+  Tooltip,
   Tr,
 } from "@chakra-ui/react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
 import { FaSearch } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
@@ -485,19 +490,6 @@ const Keuringen = () => {
   const currentItems = filteredKeuringen.slice(startIndex, endIndex);
 
   const router = useRouter();
-  const supabase = createClientComponentClient();
-
-  useEffect(() => {
-    const getSess = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
-      }
-    };
-    getSess();
-  }, [router, supabase.auth]);
 
   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -551,16 +543,29 @@ const Keuringen = () => {
           <h1 className={`${roboto900.className} ${styles.title}`}>
             KEURINGEN
           </h1>
-          <InputGroup className={styles.search} width={500}>
-            <InputLeftElement pointerEvents="none">
-              <FaSearch />
-            </InputLeftElement>
-            <Input
-              placeholder="Zoek..."
-              value={zoekKeuring}
-              onChange={handleZoekKeuringChange}
-            />
-          </InputGroup>
+          <Box display="flex" alignSelf="flex-end">
+            <Tooltip label="Keuring toevoegen" fontSize="md">
+              <IconButton
+                mb="10px"
+                mr="10px"
+                icon={<MdAdd />}
+                colorScheme="green"
+                onClick={() => {
+                  router.push("/keuringen/nieuw");
+                }}
+              />
+            </Tooltip>
+            <InputGroup className={styles.search} width={500}>
+              <InputLeftElement pointerEvents="none">
+                <FaSearch />
+              </InputLeftElement>
+              <Input
+                placeholder="Zoek..."
+                value={zoekKeuring}
+                onChange={handleZoekKeuringChange}
+              />
+            </InputGroup>
+          </Box>
         </header>
 
         {filteredKeuringen.length > 0 ? (
