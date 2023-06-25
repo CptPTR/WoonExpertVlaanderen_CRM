@@ -29,13 +29,13 @@ import {
   GridItem,
   Heading,
   Input,
+  List,
+  ListItem,
   Tag,
   TagLabel,
   Text,
   Textarea,
   Tooltip,
-  List,
-  ListItem,
 } from "@chakra-ui/react";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
@@ -547,7 +547,7 @@ const Keuring = ({ params }) => {
             </Tag>
           </header>
         )}
-        {/* {JSON.stringify(keuring)} */}
+
         <Grid
           h="750px"
           templateRows="repeat(12, 1fr)"
@@ -592,6 +592,17 @@ const Keuring = ({ params }) => {
                                   klant: {
                                     ...keuring.klant,
                                     voornaam: e.target.value,
+                                  },
+                                  facturatie: {
+                                    ...keuring.facturatie,
+                                    klant: {
+                                      ...keuring.facturatie.klant,
+                                      voornaam: e.target.value,
+                                    },
+                                    adres: {
+                                      ...keuring.facturatie.klant,
+                                      adres: e.target.value,
+                                    },
                                   },
                                 })
                               }
