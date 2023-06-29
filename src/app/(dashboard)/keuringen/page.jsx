@@ -588,7 +588,6 @@ const Keuringen = () => {
           </Box>
         </header>
 
-        <p>{JSON.stringify(keuringen)}</p>
         {filteredKeuringen.length > 0 ? (
           <div>
             <TableContainer

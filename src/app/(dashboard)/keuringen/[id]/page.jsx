@@ -566,7 +566,6 @@ const Keuring = ({ params }) => {
   return (
     <main>
       <div>
-        {JSON.stringify(keuring)}
         {keuring && (
           <header>
             <h1 className={`${roboto900.className} ${styles.title}`}>
