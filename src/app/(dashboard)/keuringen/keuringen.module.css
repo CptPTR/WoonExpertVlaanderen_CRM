@@ -41,14 +41,6 @@
   margin-left: 15px;
 }
 
-.icon {
-  border-radius: 25px;
-}
-
-.icon:hover {
-  background-color: rgb(241, 243, 245);
-}
-
 .klant,
 .adres {
   display: flex;

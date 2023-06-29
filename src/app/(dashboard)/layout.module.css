@@ -28,12 +28,14 @@
 }
 
 .sidemenu li:hover {
-  background-color: rgb(3, 102, 56);
+  background-color: green;
   color: white;
 }
 
 .logo {
   margin: 25px;
+  display: flex;
+  justify-content: center;
 }
 
 .profile {

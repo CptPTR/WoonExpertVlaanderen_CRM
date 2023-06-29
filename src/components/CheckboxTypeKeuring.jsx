@@ -2,7 +2,7 @@ import TypeKeuring from "@/models/TypeKeuring";
 import { Checkbox, CheckboxGroup, Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-const CheckboxTypeKeuring = ({ keuring, setKeuring }) => {
+const CheckboxTypeKeuring = ({ setKeuring }) => {
   const [selectedValues, setSelectedValues] = useState([]);
 
   const handleCheckboxChange = (value) => {
@@ -14,16 +14,15 @@ const CheckboxTypeKeuring = ({ keuring, setKeuring }) => {
   };
 
   useEffect(() => {
-    const updatedKeuring = {
-      ...keuring,
+    setKeuring((prevKeuring) => ({
+      ...prevKeuring,
       type: selectedValues
         .sort((a, b) => {
           return b.localeCompare(a);
         })
         .join(" + "),
-    };
-    setKeuring(updatedKeuring);
-  }, [keuring, selectedValues, setKeuring]);
+    }));
+  }, [selectedValues, setKeuring]);
 
   return (
     <CheckboxGroup colorScheme="green">

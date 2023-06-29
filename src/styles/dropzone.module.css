@@ -41,10 +41,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  height: 75px;
 }
 
 .content p {
   text-align: center;
-  width: 285px;
+  width: 300px;
 }

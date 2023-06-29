@@ -1,74 +1,220 @@
 "use client";
 
 import styles from "@/app/(dashboard)/keuringen/[id]/keuring.module.css";
-import CheckboxTypeKeuring from "@/components/CheckboxTypeKeuring";
-import Dropzone from "@/components/Dropzone";
-import RadioGroupFacturatie from "@/components/RadioGroupFacturatie";
+import ExtraDocumentenCard from "@/components/NieuweKeuring/ExtraDocumentenCard";
+import ExtraOpmerkingenCard from "@/components/NieuweKeuring/ExtraOpmerkingenCard";
+import FacturatieCard from "@/components/NieuweKeuring/FacturatieCard";
+import KlantAdresCard from "@/components/NieuweKeuring/KlantAdresCard";
+import ToegangEenheidTypeKeuringCard from "@/components/NieuweKeuring/ToegangEenheidTypeKeuringCard";
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Facturatie from "@/models/Facturatie";
 import Status from "@/models/Status";
 import ToegangEenheid from "@/models/ToegangEenheid";
 import TypeKeuring from "@/models/TypeKeuring";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Button,
-  Card,
-  CardBody,
-  CardHeader,
   Grid,
-  GridItem,
-  Heading,
-  Input,
-  List,
-  ListItem,
-  Radio,
-  RadioGroup,
-  Textarea,
-  Tooltip,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Roboto } from "next/font/google";
-import { useCallback, useState } from "react";
-import {
-  MdAlternateEmail,
-  MdDelete,
-  MdHome,
-  MdLocationCity,
-  MdPerson,
-  MdPhone,
-} from "react-icons/md";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
 const Nieuw = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
+  const router = useRouter();
+  const supabase = createClientComponentClient({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  });
+  const user = useGetCurrentUser(supabase);
   const [keuring, setKeuring] = useState({
-    klant: {},
-    adres: {},
-    immo: {},
+    adresID: {
+      straatnaam: "",
+      nummer: "",
+      postcode: "",
+      gemeente: "",
+      klantID: {
+        voornaam: "",
+        familienaam: "",
+        emailadres: "",
+        telefoonnummer: "",
+      },
+    },
+    datumPlaatsbezoek: null,
     extraDocumenten: [],
-    toegangEenheid: ToegangEenheid.KLANT,
+    toegang_eenheid: ToegangEenheid.KLANT,
     type: TypeKeuring.EPC,
-    status: Status.INGEPLAND,
+    status: Status.NIEUW,
     facturatie: {
       naar: Facturatie.HETZELFDE,
     },
-    energiedeskundige: "",
-    certificaat: "",
+    zaakvoerder: "f3474995-7517-4640-beb9-30a522ee34c5",
+    certificaat: {
+      epc: null,
+      asbest: null,
+    },
+    opmerking: "",
   });
 
-  const handleOnToegangEenheidRadioChange = (value) => {
-    setKeuring({ ...keuring, toegangEenheid: value });
-  };
+  useEffect(() => {
+    setKeuring((prevKeuring) => ({
+      ...prevKeuring,
+      immo: user.onderneming,
+    }));
+  }, [user.onderneming]);
 
-  const removeFiles = (from) => {
-    if (from == "extradocs") {
-      setKeuring((previousKeuring) => ({
-        ...previousKeuring,
-        extraDocumenten: [],
-      }));
-    } else {
-      setKeuring((previousKeuring) => ({
-        ...previousKeuring,
-        certificaat: {},
-      }));
+  const handleUploadKeuring = async () => {
+    let klantID = null;
+    let adresID = null;
+    let facturatieID = null;
+    let keuringID = null;
+
+    const { data: klantData, error: klantError } = await supabase
+      .from("Klant")
+      .insert([
+        {
+          voornaam: keuring.adresID.klantID.voornaam,
+          familienaam: keuring.adresID.klantID.familienaam,
+          emailadres: keuring.adresID.klantID.emailadres,
+          telefoonnummer: keuring.adresID.klantID.telefoonnummer,
+        },
+      ])
+      .select();
+
+    if (klantError) {
+      console.error("Error toevoegen van klant: ", klantError);
+    } else if (klantData.length > 0) {
+      klantID = klantData[0].id || null;
     }
+
+    const { data: facturatieData, error: facturatieError } = await supabase
+      .from("Facturatie")
+      .insert({
+        naar: keuring.facturatieID.naar,
+        voornaam:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.klantID.voornaam
+            : keuring.facturatieID.voornaam,
+        familienaam:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.klantID.familienaam
+            : keuring.facturatieID.familienaam,
+        emailadres:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.klantID.emailadres
+            : keuring.facturatieID.emailadres,
+        telefoonnummer:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.klantID.telefoonnummer
+            : keuring.facturatieID.telefoonnummer,
+        straatnaam:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.straatnaam
+            : keuring.facturatieID.straatnaam,
+        nummer:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.nummer
+            : keuring.facturatieID.nummer,
+        postcode:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.postcode
+            : keuring.facturatieID.postcode,
+        gemeente:
+          keuring.facturatieID.naar == Facturatie.HETZELFDE
+            ? keuring.adresID.gemeente
+            : keuring.facturatieID.gemeente,
+      })
+      .select();
+
+    if (facturatieError) {
+      console.error("Error toevoegen van facturatie: ", facturatieError);
+    } else if (facturatieData.length > 0) {
+      facturatieID = facturatieData[0].id || null;
+    }
+
+    if (klantID) {
+      const { data: adresData, error: adresError } = await supabase
+        .from("Adres")
+        .insert([
+          {
+            straatnaam: keuring.adresID.straatnaam,
+            nummer: keuring.adresID.nummer,
+            postcode: +keuring.adresID.postcode,
+            gemeente: keuring.adresID.gemeente,
+            klantID: klantID,
+            isFacturatieAdres:
+              keuring.facturatieID.naar == Facturatie.HETZELFDE ? true : false,
+          },
+        ])
+        .select();
+
+      if (adresError) {
+        console.error("Error toevoegen van adres: ", adresError);
+      } else if (adresData.length > 0) {
+        adresID = adresData[0].id || null;
+      }
+    }
+
+    if (adresID && facturatieID) {
+      const { data: keuringData, error: keuringError } = await supabase
+        .from("Keuring")
+        .insert({
+          datumPlaatsbezoek: keuring.datumPlaatsbezoek,
+          adresID: adresID,
+          facturatieID: facturatieID,
+          toegewezen_aan: keuring.zaakvoerder,
+          status: keuring.status,
+          type: keuring.type,
+          created_by: user.id,
+          opmerking: keuring.opmerking,
+          toegang_eenheid: keuring.toegang_eenheid,
+        })
+        .select();
+
+      if (keuringError) {
+        console.error("Error toevoegen van keuring: ", keuringError);
+      } else if (keuringData.length > 0) {
+        keuringID = keuringData[0].id || null;
+      }
+    }
+
+    if (keuring.extraDocumenten.length > 0) {
+      if (keuringID) {
+        keuring.extraDocumenten.forEach(async (extraDocument) => {
+          const { data: extraDocumentData, error: extraDocumentError } =
+            await supabase
+              .from("ExtraDocument")
+              .insert({
+                format: extraDocument.format,
+                name: extraDocument.name,
+                size: extraDocument.size,
+                cldnry_id: extraDocument.id,
+                keuringID: keuringID,
+              })
+              .select();
+
+          if (extraDocumentError) {
+            console.error(
+              "Error toevoegen van extra document: ",
+              extraDocumentError
+            );
+          }
+        });
+      }
+    }
+
+    router.replace("/keuringen");
   };
 
   return (
@@ -79,337 +225,51 @@ const Nieuw = () => {
             <h1 className={`${roboto900.className} ${styles.title}`}>
               NIEUWE KEURING
             </h1>
-            <Button colorScheme="green">OPSLAAN</Button>
+            <Button colorScheme="green" onClick={onOpen}>
+              OPSLAAN
+            </Button>
+            <AlertDialog
+              isOpen={isOpen}
+              leastDestructiveRef={cancelRef}
+              onClose={onClose}
+            >
+              <AlertDialogOverlay>
+                <AlertDialogContent>
+                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                    Keuring opslaan
+                  </AlertDialogHeader>
+                  <AlertDialogBody>
+                    Ben je zeker dat u deze keuring wil opslaan?
+                    {JSON.stringify(keuring)}
+                  </AlertDialogBody>
+                  <AlertDialogFooter>
+                    <Button ref={cancelRef} onClick={onClose}>
+                      Sluit venster
+                    </Button>
+                    <Button ml={3} onClick={handleUploadKeuring}>
+                      Upload Keuring
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialogOverlay>
+            </AlertDialog>
           </header>
         }
         <Grid
-          h="750px"
+          h="800px"
           templateRows="repeat(12, 1fr)"
           templateColumns="repeat(12, 1fr)"
-          gap={30}
+          gap={15}
         >
-          <GridItem
-            rowSpan={7}
-            colSpan={4}
-            bg="white"
-            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-            position={"relative"}
-          >
-            <Card padding="16px 24px" height="100%">
-              <CardHeader padding="20px 20px 10px 20px">
-                <Heading size="md">Klant</Heading>
-              </CardHeader>
-              <CardBody>
-                <List>
-                  <ListItem className={styles.klant}>
-                    <MdPerson size={24} style={{ margin: "0 20px" }} />
-
-                    <Input
-                      placeholder="Voornaam"
-                      width="150px"
-                      height="27px"
-                      fontSize="16px"
-                      onBlur={(e) =>
-                        setKeuring({
-                          ...keuring,
-                          klant: {
-                            ...keuring.klant,
-                            voornaam: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                    <Input
-                      placeholder="Familienaam"
-                      width="175px"
-                      height="27px"
-                      fontSize="16px"
-                      onBlur={(e) =>
-                        setKeuring({
-                          ...keuring,
-                          klant: {
-                            ...keuring.klant,
-                            achternaam: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </ListItem>
-                  <ListItem className={styles.klant}>
-                    <MdAlternateEmail size={24} style={{ margin: "0 20px" }} />
-
-                    <Input
-                      placeholder="E-mail"
-                      type="email"
-                      width="325px"
-                      height="27px"
-                      fontSize="16px"
-                      onBlur={(e) =>
-                        setKeuring({
-                          ...keuring,
-                          klant: {
-                            ...keuring.klant,
-                            email: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </ListItem>
-                  <ListItem className={styles.klant}>
-                    <MdPhone size={24} style={{ margin: "0 20px" }} />
-
-                    <Input
-                      placeholder="Telefoonnummer"
-                      type="tel"
-                      width="325px"
-                      height="27px"
-                      fontSize="16px"
-                      onBlur={(e) =>
-                        setKeuring({
-                          ...keuring,
-                          klant: {
-                            ...keuring.klant,
-                            telefoonnummer: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </ListItem>
-                </List>
-              </CardBody>
-              <CardHeader padding="20px 20px 10px 20px">
-                <Heading size="md">Adres</Heading>
-              </CardHeader>
-              <CardBody>
-                <List>
-                  {keuring && (
-                    <>
-                      <ListItem className={styles.adres}>
-                        <MdHome size={24} style={{ margin: "0 20px" }} />
-
-                        <Input
-                          placeholder="Straatnaam"
-                          type="text"
-                          width="250px"
-                          height="27px"
-                          fontSize="16px"
-                          onBlur={(e) =>
-                            setKeuring({
-                              ...keuring,
-                              adres: {
-                                ...keuring.adres,
-                                straat: e.target.value,
-                              },
-                            })
-                          }
-                        />
-                        <Input
-                          placeholder="Nr"
-                          type="number"
-                          width="75px"
-                          height="27px"
-                          fontSize="16px"
-                          onBlur={(e) =>
-                            setKeuring({
-                              ...keuring,
-                              adres: {
-                                ...keuring.adres,
-                                nummer: +e.target.value,
-                              },
-                            })
-                          }
-                        />
-                      </ListItem>
-                      <ListItem className={styles.adres}>
-                        <MdLocationCity
-                          size={24}
-                          style={{ margin: "0 20px" }}
-                        />
-
-                        <Input
-                          placeholder="Postcode"
-                          type="number"
-                          width="100px"
-                          height="27px"
-                          fontSize="16px"
-                          onBlur={(e) =>
-                            setKeuring({
-                              ...keuring,
-                              adres: {
-                                ...keuring.adres,
-                                postcode: +e.target.value,
-                              },
-                            })
-                          }
-                        />
-                        <Input
-                          placeholder="Gemeente"
-                          width="225px"
-                          height="27px"
-                          fontSize="16px"
-                          onBlur={(e) =>
-                            setKeuring({
-                              ...keuring,
-                              adres: {
-                                ...keuring.adres,
-                                gemeente: e.target.value,
-                              },
-                            })
-                          }
-                        />
-                      </ListItem>
-                    </>
-                  )}
-                </List>
-              </CardBody>
-            </Card>
-          </GridItem>
-          <GridItem
-            rowSpan={7}
-            colSpan={4}
-            bg="white"
-            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-          >
-            <Card padding="16px 24px" height="100%">
-              <CardHeader padding="20px 20px 10px 20px">
-                <Heading size="md">Facturatie</Heading>
-                <RadioGroupFacturatie
-                  keuring={keuring}
-                  setKeuring={setKeuring}
-                />
-              </CardHeader>
-            </Card>
-          </GridItem>
-          <GridItem
-            rowSpan={7}
-            colSpan={4}
-            bg="white"
-            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-          >
-            <Card height="100%">
-              <div className={styles.editIconsContainer}>
-                <Tooltip
-                  label="Verwijder alle documenten"
-                  placement="bottom-end"
-                >
-                  <div
-                    className={styles.editIconContainer}
-                    onClick={() => removeFiles("extradocs")}
-                  >
-                    <MdDelete className={styles.editIcon} size={24} />
-                  </div>
-                </Tooltip>
-              </div>
-              <CardHeader padding="36px 44px">
-                <Heading size="md">Extra documenten</Heading>
-              </CardHeader>
-              <Dropzone
-                keuring={keuring}
-                setKeuring={setKeuring}
-                forFiles="extradocs"
-                acceptFileType="images"
-                multipleFiles
-                text="Sleep hier afbeeldingen/PDF-bestanden naartoe, of klik om ze te selecteren."
-              />
-            </Card>
-          </GridItem>
-
-          <GridItem
-            rowSpan={5}
-            colSpan={3}
-            bg="white"
-            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-          >
-            <Card padding="16px 24px" height="100%">
-              <CardHeader padding="20px 20px 10px 20px">
-                <Heading size="md">Toegang eenheid</Heading>
-              </CardHeader>
-              <CardBody>
-                <RadioGroup
-                  name="Toegang eenheid"
-                  onChange={handleOnToegangEenheidRadioChange}
-                  value={keuring.toegangEenheid}
-                  ml={5}
-                >
-                  <Radio value={ToegangEenheid.KLANT} colorScheme="green">
-                    {ToegangEenheid.KLANT}
-                  </Radio>
-                  <Radio
-                    value={ToegangEenheid.SLEUTEL_OPHALEN}
-                    colorScheme="green"
-                  >
-                    {ToegangEenheid.SLEUTEL_OPHALEN}
-                  </Radio>
-                </RadioGroup>
-                <Heading size="md" mt="40px" mb="30px">
-                  Type
-                </Heading>
-
-                <CheckboxTypeKeuring
-                  keuring={keuring}
-                  setKeuring={setKeuring}
-                />
-              </CardBody>
-            </Card>
-          </GridItem>
-          <GridItem
-            rowSpan={5}
-            colSpan={5}
-            bg="white"
-            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-          >
-            <Card padding="16px 24px" height="100%">
-              <CardHeader padding="20px 20px 10px 20px">
-                <Heading size="md">Extra opmerkingen</Heading>
-              </CardHeader>
-              <CardBody height={"100%"}>
-                <Textarea
-                  width="100%"
-                  height="100px"
-                  fontSize="16px"
-                  padding="10px"
-                  resize="none"
-                  borderRadius="5px"
-                  borderColor="blackAlpha.500"
-                  onBlur={useCallback(
-                    (e) => {
-                      setKeuring({ ...keuring, opmerking: e.target.value });
-                    },
-                    [keuring]
-                  )}
-                />
-              </CardBody>
-            </Card>
-          </GridItem>
-          <GridItem
-            rowSpan={5}
-            colSpan={4}
-            bg="white"
-            boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-          >
-            <Card padding="16px 24px" height="100%">
-              <div className={styles.editIconsContainer}>
-                <Tooltip label="Verwijder certificaat" placement="bottom-end">
-                  <div
-                    className={styles.editIconContainer}
-                    onClick={() => removeFiles("certificaat")}
-                  >
-                    <MdDelete className={styles.editIcon} size={24} />
-                  </div>
-                </Tooltip>
-              </div>
-              <CardHeader padding="20px 20px 10px 20px">
-                <Heading size="md">Energiecertificaat</Heading>
-              </CardHeader>
-              <Dropzone
-                keuring={keuring}
-                setKeuring={setKeuring}
-                forFiles="certificaat"
-                acceptFileType="pdf"
-                text="Sleep hier een PDF-bestand naartoe, of klik om een bestand te selecteren"
-              />
-            </Card>
-          </GridItem>
+          <KlantAdresCard keuring={keuring} setKeuring={setKeuring} />
+          <FacturatieCard keuring={keuring} setKeuring={setKeuring} />
+          <ExtraDocumentenCard keuring={keuring} setKeuring={setKeuring} />
+          <ToegangEenheidTypeKeuringCard
+            keuring={keuring}
+            setKeuring={setKeuring}
+          />
+          <ExtraOpmerkingenCard keuring={keuring} setKeuring={setKeuring} />
+          {/* <CertificatenCard keuring={keuring} setKeuring={setKeuring} /> */}
         </Grid>
       </div>
     </main>

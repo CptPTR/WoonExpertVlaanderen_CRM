@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import styles from "@/app/login/login.module.css";
-import Logo from "@/assets/images/wev_logo.png";
+import Logo from "@/assets/images/WEV_LOGO.svg";
 import {
   Box,
   Button,

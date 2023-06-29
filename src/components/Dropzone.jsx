@@ -5,7 +5,7 @@ import { Box, List, ListItem } from "@chakra-ui/react";
 
 import styles from "@/styles/dropzone.module.css";
 import { CardBody } from "@chakra-ui/react";
-import Image from "next/image";
+import { Image } from "cloudinary-react";
 import { FaRegFilePdf } from "react-icons/fa";
 
 const Dropzone = ({
@@ -30,26 +30,64 @@ const Dropzone = ({
 
   const onDrop = useCallback(
     (acceptedFiles) => {
-      if (acceptedFiles?.length) {
-        const updatedFiles = acceptedFiles.map((file) =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
+      const url = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
+
+      acceptedFiles.forEach(async (acceptedFile) => {
+        const formData = new FormData();
+        formData.append("file", acceptedFile);
+        formData.append(
+          "upload_preset",
+          process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
         );
+
+        const response = await fetch(url, {
+          method: "post",
+          body: formData,
+        });
+
+        const data = await response.json();
 
         if (forFiles == "extradocs") {
           setKeuring((previousKeuring) => ({
             ...previousKeuring,
             extraDocumenten: [
               ...previousKeuring.extraDocumenten,
-              ...updatedFiles,
+              {
+                id: data.public_id,
+                format: data.format,
+                name: data.original_filename,
+                size: data.bytes,
+              },
             ],
           }));
-        } else {
+        } else if (forFiles == "epc-certificaat") {
           setKeuring((previousKeuring) => ({
             ...previousKeuring,
-            certificaat: updatedFiles[0],
+            certificaat: {
+              ...previousKeuring.certificaat,
+              epc: {
+                id: data.public_id,
+                format: data.format,
+                name: data.original_filename,
+                size: data.bytes,
+              },
+            },
+          }));
+        } else if (forFiles == "asbest-certificaat") {
+          setKeuring((previousKeuring) => ({
+            ...previousKeuring,
+            certificaat: {
+              ...previousKeuring.certificaat,
+              asbest: {
+                id: data.public_id,
+                format: data.format,
+                name: data.original_filename,
+                size: data.bytes,
+              },
+            },
           }));
         }
-      }
+      });
     },
     [forFiles, setKeuring]
   );
@@ -84,98 +122,129 @@ const Dropzone = ({
   };
 
   const renderDropZone = (forFiles) => {
-    if (forFiles == "extradocs") {
-      return (
-        <>
-          {!keuring?.extraDocumenten.length > 0 ? (
-            isDragActive ? (
-              <div className={styles.content}>
-                <p>Drop de bestanden hier..</p>
+    if (forFiles === "extradocs") {
+      if (!keuring?.extraDocumenten.length > 0) {
+        return isDragActive ? (
+          <div className={styles.content}>
+            <p>Drop the files here..</p>
+          </div>
+        ) : (
+          renderDefaultContent()
+        );
+      } else {
+        return (
+          <div className={styles.content}>
+            <List>
+              {keuring?.extraDocumenten.map((xtraDoc) => (
+                <ListItem key={xtraDoc.id}>
+                  <div className={styles.imageContainer}>
+                    {xtraDoc.format !== "pdf" ? (
+                      <Image
+                        alt=""
+                        cloudName={
+                          process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+                        }
+                        publicId={xtraDoc.id}
+                        width="100"
+                        height="100"
+                        scrop="scale"
+                      />
+                    ) : (
+                      <FaRegFilePdf size={48} color="#F40F02" />
+                    )}
+                  </div>
+
+                  <div className={styles.imageInfo}>
+                    <span className={styles.imageName}>{xtraDoc.name}</span>
+                    <span className={styles.imageSize}>
+                      {formatFileSize(xtraDoc.size)}
+                    </span>
+                  </div>
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        );
+      }
+    } else if (forFiles === "epc-certificaat") {
+      if (Object.keys(keuring?.certificaat?.epc ?? {}).length === 0) {
+        return isDragActive ? (
+          <div className={styles.content}>
+            <p>Drop the PDF file here..</p>
+          </div>
+        ) : (
+          renderDefaultContent()
+        );
+      } else {
+        return (
+          <div className={styles.content}>
+            <Box display="flex">
+              <div className={styles.imageContainer}>
+                <FaRegFilePdf size={48} color="#F40F02" />
               </div>
-            ) : (
-              <div className={styles.content}>
-                <div className={styles.icon}>
-                  <FaRegFilePdf size={48} color="#F40F02" />
-                </div>
-                <p>{text}</p>
+              <div className={styles.imageInfo}>
+                <span className={styles.imageName}>
+                  {keuring.certificaat.epc.name}
+                </span>
+                <span className={styles.imageSize}>
+                  {formatFileSize(keuring.certificaat.epc.size)}
+                </span>
               </div>
-            )
-          ) : (
-            <div className={styles.content}>
-              <List>
-                {keuring?.extraDocumenten.map((file) => (
-                  <ListItem key={file.name}>
-                    <div className={styles.imageContainer}>
-                      {file.type.startsWith("image/") ? (
-                        <Image
-                          width={100}
-                          height={100}
-                          src={file.preview}
-                          alt=""
-                          style={{ objectFit: "contain" }}
-                        />
-                      ) : (
-                        <FaRegFilePdf size={48} color="#F40F02" />
-                      )}
-                    </div>
-                    <div className={styles.imageInfo}>
-                      <span className={styles.imageName}>{file.name}</span>
-                      <span className={styles.imageSize}>
-                        {formatFileSize(file.size)}
-                      </span>
-                    </div>
-                  </ListItem>
-                ))}
-              </List>
-            </div>
-          )}
-        </>
-      );
-    } else {
-      return (
-        <>
-          {Object.keys(keuring?.certificaat ?? {}).length === 0 ? (
-            isDragActive ? (
-              <div className={styles.content}>
-                <p>Drop het PDF-bestand hier..</p>
+            </Box>
+          </div>
+        );
+      }
+    } else if (forFiles === "asbest-certificaat") {
+      if (Object.keys(keuring?.certificaat?.asbest ?? {}).length === 0) {
+        return isDragActive ? (
+          <div className={styles.content}>
+            <p>Drop the PDF file here..</p>
+          </div>
+        ) : (
+          renderDefaultContent()
+        );
+      } else {
+        return (
+          <div className={styles.content}>
+            <Box display="flex">
+              <div className={styles.imageContainer}>
+                <FaRegFilePdf size={48} color="#F40F02" />
               </div>
-            ) : (
-              <div className={styles.content}>
-                <div className={styles.icon}>
-                  <FaRegFilePdf size={48} color="#F40F02" />
-                </div>
-                <p>{text}</p>
+              <div className={styles.imageInfo}>
+                <span className={styles.imageName}>
+                  {keuring.certificaat.asbest.name}
+                </span>
+                <span className={styles.imageSize}>
+                  {formatFileSize(keuring.certificaat.asbest.size)}
+                </span>
               </div>
-            )
-          ) : (
-            <div className={styles.content}>
-              <Box display="flex">
-                <div className={styles.imageContainer}>
-                  <FaRegFilePdf size={48} color="#F40F02" />
-                </div>
-                <div className={styles.imageInfo}>
-                  <span className={styles.imageName}>
-                    {keuring.certificaat.name}
-                  </span>
-                  <span className={styles.imageSize}>
-                    {formatFileSize(keuring.certificaat.size)}
-                  </span>
-                </div>
-              </Box>
-            </div>
-          )}
-        </>
-      );
+            </Box>
+          </div>
+        );
+      }
     }
+  };
+
+  const renderDefaultContent = () => {
+    return (
+      <div className={styles.content}>
+        <div className={styles.icon}>
+          <FaRegFilePdf size={48} color="#F40F02" />
+        </div>
+        <p>{text}</p>
+      </div>
+    );
   };
 
   return (
     <CardBody style={getStyle()}>
       <div {...getRootProps()} className={styles.dropzone}>
         <input {...getInputProps()} />
-        {forFiles == "extradocs"
+        {forFiles === "extradocs"
           ? renderDropZone("extradocs")
-          : renderDropZone("certificaat")}
+          : forFiles === "epc-certificaat"
+          ? renderDropZone("epc-certificaat")
+          : renderDropZone("asbest-certificaat")}
       </div>
     </CardBody>
   );
