@@ -5,7 +5,6 @@ import { Roboto } from "next/font/google";
 import styles from "@/app/(dashboard)/keuringen/keuringen.module.css";
 
 import Status from "@/models/Status";
-import TypeKeuring from "@/models/TypeKeuring";
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -17,8 +16,6 @@ import {
 
 import KeuringNietGevonden from "@/assets/images/keuring_niet_gevonden.png";
 import { getBackgroundStatusColor } from "@/helpers/helpers";
-import Facturatie from "@/models/Facturatie";
-import ToegangEenheid from "@/models/ToegangEenheid";
 import {
   Box,
   Button,
@@ -36,453 +33,13 @@ import {
   Tooltip,
   Tr,
 } from "@chakra-ui/react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { FaSearch } from "react-icons/fa";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
 const Keuringen = () => {
-  // const keuringen = [
-  //   {
-  //     id: 0,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     facturatie: {
-  //       naar: Facturatie.ANDERS,
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 1,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 14, 14, 0),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Emma",
-  //       familienaam: "Plots",
-  //       email: "emma.plots@gmail.com",
-  //       telefoonnummer: "0492521644",
-  //     },
-  //     adres: {
-  //       id: 2,
-  //       straat: "Antwerpsesteenweg",
-  //       nummer: 52,
-  //       gemeente: "Mechelen",
-  //       postcode: 2800,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.ASBEST,
-  //     status: Status.IN_BEHANDELING,
-  //     energiedeskundige: "Bob",
-  //     certificaat: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 5, 10, 15),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Manny",
-  //       familienaam: "Hebbe",
-  //       email: "m.hebbe@gmail.com",
-  //       telefoonnummer: "0492664852",
-  //     },
-  //     adres: {
-  //       id: 3,
-  //       straat: "Liersesteenweg",
-  //       nummer: 24,
-  //       gemeente: "Mechelen",
-  //       postcode: 2800,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.NIEUW,
-  //     energiedeskundige: "Danny",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 12, 15),
-  //     klant: {
-  //       id: 4,
-  //       voornaam: "Hanne",
-  //       familienaam: "Sloots",
-  //       email: "Hanne.Sloots@hotmail.com",
-  //       telefoonnummer: "0492625299",
-  //     },
-  //     adres: {
-  //       id: 4,
-  //       straat: "Liersesteenweg",
-  //       nummer: 30,
-  //       gemeente: "Mechelen",
-  //       postcode: 2800,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: `${TypeKeuring.EPC} + ${TypeKeuring.ASBEST}`,
-  //     status: Status.CERTIFICAAT,
-  //     energiedeskundige: "Danny",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 4,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 5,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 6,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 14, 14, 0),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Emma",
-  //       familienaam: "Plots",
-  //       email: "emma.plots@gmail.com",
-  //       telefoonnummer: "0492521644",
-  //     },
-  //     adres: {
-  //       id: 2,
-  //       straat: "Antwerpsesteenweg",
-  //       nummer: 52,
-  //       gemeente: "Mechelen",
-  //       postcode: 2800,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
-  //     type: TypeKeuring.ASBEST,
-  //     status: Status.IN_BEHANDELING,
-  //     energiedeskundige: "Bob",
-  //     certificaat: true,
-  //   },
-  //   {
-  //     id: 7,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 5, 10, 15),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Manny",
-  //       familienaam: "Hebbe",
-  //       email: "m.hebbe@gmail.com",
-  //       telefoonnummer: "0492664852",
-  //     },
-  //     adres: {
-  //       id: 3,
-  //       straat: "Liersesteenweg",
-  //       nummer: 24,
-  //       gemeente: "Mechelen",
-  //       postcode: 2800,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.NIEUW,
-  //     energiedeskundige: "Danny",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 8,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 12, 15),
-  //     klant: {
-  //       id: 4,
-  //       voornaam: "Hanne",
-  //       familienaam: "Sloots",
-  //       email: "Hanne.Sloots@hotmail.com",
-  //       telefoonnummer: "0492625299",
-  //     },
-  //     adres: {
-  //       id: 4,
-  //       straat: "Liersesteenweg",
-  //       nummer: 30,
-  //       gemeente: "Mechelen",
-  //       postcode: 2800,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
-  //     type: `${TypeKeuring.EPC} + ${TypeKeuring.ASBEST}`,
-  //     status: Status.CERTIFICAAT,
-  //     energiedeskundige: "Danny",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 9,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 10,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 11,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 12,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.SLEUTEL_OPHALEN,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 13,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Peter",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  //   {
-  //     id: 14,
-  //     datumToewijzing: new Date(),
-  //     datumPlaatsbezoek: new Date(2023, 8, 7, 10, 30),
-  //     klant: {
-  //       id: 1,
-  //       voornaam: "Pet",
-  //       familienaam: "De Clercq",
-  //       email: "dclercqpeter@gmail.com",
-  //       telefoonnummer: "0492316422",
-  //     },
-  //     adres: {
-  //       id: 1,
-  //       straat: "Populierenstraat",
-  //       nummer: 4,
-  //       gemeente: "Sint-Katelijne-Waver",
-  //       postcode: 2860,
-  //     },
-  //     immo: {
-  //       id: 1,
-  //       naam: "Vastgoed Heylen",
-  //     },
-  //     opmerking: "",
-  //     toegangEenheid: ToegangEenheid.KLANT,
-  //     type: TypeKeuring.EPC,
-  //     status: Status.INGEPLAND,
-  //     energiedeskundige: "Bob",
-  //     certificaat: false,
-  //   },
-  // ];
   const [keuringen, setKeuringen] = useState([]);
   const [zoekKeuring, setZoekKeuring] = useState("");
   const [filteredKeuringen, setFilteredKeuringen] = useState(keuringen);
@@ -524,18 +81,23 @@ const Keuringen = () => {
     const { value } = event.target;
     setZoekKeuring(value);
 
-    const filteredData = value
-      ? keuringen.filter((keuring) => {
-          return (
-            `${keuring.adresID.klantID.voornaam} ${keuring.adresID.klantID.familienaam}`.includes(
-              value
-            ) || keuring.adresID.straatnaam.includes(value)
-          );
-        })
-      : keuringen;
+    const filteredData = keuringen.filter((keuring) => {
+      return (
+        `${keuring.adresID.klantID.voornaam} ${keuring.adresID.klantID.familienaam}`.includes(
+          value
+        ) || keuring.adresID.straatnaam.includes(value)
+      );
+    });
 
     setFilteredKeuringen(filteredData);
+    setTotalItems(filteredData.length);
+    setCurrentPage(1);
   };
+
+  useEffect(() => {
+    setFilteredKeuringen(keuringen);
+    setTotalItems(keuringen.length);
+  }, [keuringen]);
 
   useEffect(() => {
     const getKeuringenData = async () => {
@@ -551,10 +113,6 @@ const Keuringen = () => {
 
     getKeuringenData();
   }, [supabase]);
-
-  useEffect(() => {
-    setFilteredKeuringen(keuringen);
-  }, [keuringen]);
 
   return (
     <main>
@@ -620,7 +178,7 @@ const Keuringen = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {keuringen.map((keuring, index) => {
+                  {currentItems.map((keuring, index) => {
                     return (
                       <Tr key={keuring.id}>
                         <Td css={{ padding: "25px 0" }}>
