@@ -240,7 +240,6 @@ const Nieuw = () => {
                   </AlertDialogHeader>
                   <AlertDialogBody>
                     Ben je zeker dat u deze keuring wil opslaan?
-                    {JSON.stringify(keuring)}
                   </AlertDialogBody>
                   <AlertDialogFooter>
                     <Button ref={cancelRef} onClick={onClose}>
