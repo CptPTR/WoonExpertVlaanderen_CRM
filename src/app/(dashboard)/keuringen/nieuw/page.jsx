@@ -124,12 +124,12 @@ const Nieuw = () => {
             : keuring.facturatieID.straatnaam,
         nummer:
           keuring.facturatieID.naar == Facturatie.HETZELFDE
-            ? keuring.adresID.nummer
-            : keuring.facturatieID.nummer,
+            ? +keuring.adresID.nummer
+            : +keuring.facturatieID.nummer,
         postcode:
           keuring.facturatieID.naar == Facturatie.HETZELFDE
-            ? keuring.adresID.postcode
-            : keuring.facturatieID.postcode,
+            ? +keuring.adresID.postcode
+            : +keuring.facturatieID.postcode,
         gemeente:
           keuring.facturatieID.naar == Facturatie.HETZELFDE
             ? keuring.adresID.gemeente

@@ -31,8 +31,8 @@ const RadioGroupFacturatie = ({ keuring, setKeuring }) => {
         emailadres: keuring.adresID.klantID.emailadres,
         telefoonnummer: keuring.adresID.klantID.telefoonnummer,
         straatnaam: keuring.adresID.straatnaam,
-        nummer: keuring.adresID.nummer,
-        postcode: keuring.adresID.postcode,
+        nummer: +keuring.adresID.nummer,
+        postcode: +keuring.adresID.postcode,
         gemeente: keuring.adresID.gemeente,
       };
     }
