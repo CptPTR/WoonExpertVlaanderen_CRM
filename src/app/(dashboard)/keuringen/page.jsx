@@ -12,6 +12,7 @@ import {
   MdAdd,
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight,
+  MdRefresh,
 } from "react-icons/md";
 
 import KeuringNietGevonden from "@/assets/images/keuring_niet_gevonden.png";
@@ -114,6 +115,8 @@ const Keuringen = () => {
     getKeuringenData();
   }, [supabase]);
 
+  const handleRefreshKeuringTabel = () => {};
+
   return (
     <main>
       <div className={styles.keuringenContainer}>
@@ -122,6 +125,15 @@ const Keuringen = () => {
             KEURINGEN
           </h1>
           <Box display="flex" alignSelf="flex-end">
+            <Tooltip label="Refresh keuringen tabel" fontSize="md">
+              <IconButton
+                mb="10px"
+                mr="10px"
+                icon={<MdRefresh />}
+                colorScheme="green"
+                onClick={handleRefreshKeuringTabel}
+              />
+            </Tooltip>
             <Tooltip label="Keuring toevoegen" fontSize="md">
               <IconButton
                 mb="10px"
