@@ -1,0 +1,34 @@
+.modalHeader {
+  display: flex;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.klant {
+  display: flex;
+  padding: 8px 0;
+}
+
+.cardBody label {
+  margin: 10px 0;
+}
+
+.validationErrors {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  width: 1200px;
+}
+
+.validationErrors span {
+  padding: 5px 10px;
+  margin-right: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.validationErrors hr {
+  background-color: tomato;
+  width: 2px;
+}

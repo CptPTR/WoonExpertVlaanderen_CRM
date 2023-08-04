@@ -3,6 +3,19 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  height: 432px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-color: grey #e4e4e4;
+  scrollbar-width: thin;
+}
+
+.dzone {
+  text-align: center;
+}
+
+.content ul {
+  margin: 0;
 }
 
 .content li {
@@ -13,26 +26,31 @@
 
 .imageContainer {
   width: 100px;
-  height: 100px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.imageInfo {
+.documentInfo {
   display: flex;
   width: 300px;
-  flex-direction: column;
-  justify-content: center;
-  padding-left: 30px;
+  align-items: center;
 }
 
-.imageName {
+.documentName {
+  height: 24px;
+  width: 175px;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.imageSize {
-  margin-top: 10px;
+.documentSize {
+  text-align: end;
+  width: fit-content;
+  margin-right: 35px;
   font-size: 12px;
 }
 

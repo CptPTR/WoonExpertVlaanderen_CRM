@@ -26,6 +26,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordHidden, setPasswordHidden] = useState(true);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -37,7 +38,7 @@ export default function Login() {
       password,
     });
     if (error) {
-      console.log(error);
+      setPasswordErrorMessage(error.message);
     } else {
       router.push("/keuringen");
     }
@@ -86,6 +87,7 @@ export default function Login() {
               />
             </InputRightElement>
           </InputGroup>
+          <Text>{passwordErrorMessage}</Text>
         </FormControl>
         <Button
           mt="30px"

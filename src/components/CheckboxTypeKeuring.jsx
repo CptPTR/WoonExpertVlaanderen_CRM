@@ -1,49 +1,58 @@
 import TypeKeuring from "@/models/TypeKeuring";
 import { Checkbox, CheckboxGroup, Stack } from "@chakra-ui/react";
+import { debounce } from "lodash";
 import { useEffect, useState } from "react";
+import { Controller } from "react-hook-form";
 
-const CheckboxTypeKeuring = ({ setKeuring }) => {
-  const [selectedValues, setSelectedValues] = useState([]);
-
-  const handleCheckboxChange = (value) => {
-    if (selectedValues.includes(value)) {
-      setSelectedValues((prevValues) => prevValues.filter((v) => v !== value));
-    } else {
-      setSelectedValues((prevValues) => [...prevValues, value]);
-    }
-  };
+const CheckboxTypeKeuring = ({ control, typeKeuring }) => {
+  const [selectedValues, setSelectedValues] = useState(
+    typeKeuring ? typeKeuring.replaceAll(" ", "").split("+") : []
+  );
 
   useEffect(() => {
-    setKeuring((prevKeuring) => ({
-      ...prevKeuring,
-      type: selectedValues
-        .sort((a, b) => {
-          return b.localeCompare(a);
-        })
-        .join(" + "),
-    }));
-  }, [selectedValues, setKeuring]);
+    setSelectedValues((prevValues) => {
+      const newValues = prevValues.filter((value) =>
+        Object.values(TypeKeuring).includes(value)
+      );
+      return newValues;
+    });
+  }, []);
+
+  const debouncedCheckboxChange = debounce((values) => {
+    setSelectedValues(values);
+  }, 100);
+
+  const sortValues = (values) => {
+    return values.sort().reverse();
+  };
 
   return (
-    <CheckboxGroup colorScheme="green">
-      <Stack direction="row" ml={5}>
-        <Checkbox
-          value={TypeKeuring.EPC}
-          isChecked={selectedValues.includes(TypeKeuring.EPC)}
-          onChange={() => handleCheckboxChange(TypeKeuring.EPC)}
+    <Controller
+      name="type"
+      control={control}
+      render={({ field }) => (
+        <CheckboxGroup
+          colorScheme="green"
+          onChange={(values) => {
+            debouncedCheckboxChange(values);
+            field.onChange(sortValues(values).join(" + "));
+          }}
+          value={selectedValues}
         >
-          {TypeKeuring.EPC}
-        </Checkbox>
-        <Checkbox
-          value={TypeKeuring.ASBEST}
-          ml={5}
-          isChecked={selectedValues.includes(TypeKeuring.ASBEST)}
-          onChange={() => handleCheckboxChange(TypeKeuring.ASBEST)}
-        >
-          {TypeKeuring.ASBEST}
-        </Checkbox>
-      </Stack>
-    </CheckboxGroup>
+          <Stack ml={15} gap={0}>
+            {Object.values(TypeKeuring).map((value) => (
+              <Checkbox
+                key={value}
+                value={value}
+                isChecked={selectedValues.includes(value)}
+              >
+                {value}
+              </Checkbox>
+            ))}
+          </Stack>
+        </CheckboxGroup>
+      )}
+    />
   );
 };
 
