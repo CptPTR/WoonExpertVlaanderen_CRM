@@ -1,26 +1,15 @@
 "use client";
 
-import { Roboto } from "next/font/google";
-
 import styles from "@/app/(dashboard)/keuringen/keuringen.module.css";
-
-import Status from "@/models/Status";
-
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import {
-  MdAdd,
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-  MdRefresh,
-} from "react-icons/md";
-
 import KeuringNietGevonden from "@/assets/images/keuring_niet_gevonden.png";
+import Form from "@/components/NieuweKeuring/Form";
 import { getBackgroundStatusColor } from "@/helpers/helpers";
+import Status from "@/models/Status";
 import {
   Box,
   Button,
   ButtonGroup,
+  Heading,
   IconButton,
   Input,
   InputGroup,
@@ -33,11 +22,19 @@ import {
   Thead,
   Tooltip,
   Tr,
+  Text,
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Roboto } from "next/font/google";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import Form from "@/components/NieuweKeuring/Form";
+import {
+  MdKeyboardArrowLeft,
+  MdKeyboardArrowRight,
+  MdRefresh,
+} from "react-icons/md";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
 
@@ -106,7 +103,7 @@ const Keuringen = () => {
       const { data: keuringenData, error: keuringenError } = await supabase
         .from("Keuring")
         .select(
-          `id, datumToewijzing, status, type, adresID(straatnaam, nummer, postcode, gemeente, klantID(voornaam, familienaam, emailadres, telefoonnummer)), created_by(ondernemingID(naam))`
+          `id, datumToewijzing, datumPlaatsbezoek, status, type, adresID(straatnaam, nummer, postcode, gemeente, klantID(voornaam, familienaam, emailadres, telefoonnummer)), created_by(ondernemingID(naam))`
         );
       if (keuringenData) {
         setKeuringen(keuringenData);
@@ -121,7 +118,9 @@ const Keuringen = () => {
   return (
     <Box display="flex" flexDirection="column">
       <header className={styles.header}>
-        <h1 className={`${roboto900.className} ${styles.title}`}>KEURINGEN</h1>
+        <Heading size="md" className={`${roboto900.className} ${styles.title}`}>
+          KEURINGEN
+        </Heading>
         <Box display="flex" alignSelf="flex-end">
           <Tooltip label="Herlaad tabel" fontSize="md" placement="top-end">
             <IconButton
@@ -159,14 +158,10 @@ const Keuringen = () => {
                   boxShadow: "0 12px 20px 6px rgb(104 112 118 / 0.08)",
                 }}
               >
-                <Table variant="simple" css={{ width: "100%" }}>
+                <Table variant="simple">
                   <Thead>
                     <Tr className={styles.tableColumn}>
-                      <Th
-                        css={{
-                          padding: "20px 0",
-                        }}
-                      >
+                      <Th>
                         DATUM <br />
                         TOEWIJZING
                       </Th>
@@ -182,35 +177,46 @@ const Keuringen = () => {
                     {currentItems.map((keuring, index) => {
                       return (
                         <Tr key={keuring.id}>
-                          <Td css={{ padding: "25px 0" }}>
-                            {formatDate(keuring.datumToewijzing)}
+                          <Td>
+                            <Text fontSize="small">
+                              {formatDate(keuring.datumToewijzing)}
+                            </Text>
                           </Td>
-                          <Td>{keuring.created_by.ondernemingID.naam}</Td>
+                          <Td>
+                            <Text fontSize="small">
+                              {keuring.created_by.ondernemingID.naam}
+                            </Text>
+                          </Td>
                           <Td>
                             <div className={styles.klant}>
-                              <span className={styles.naam}>
+                              <Text fontSize="small" className={styles.naam}>
                                 {keuring.adresID.klantID.voornaam +
                                   " " +
                                   keuring.adresID.klantID.familienaam}
-                              </span>
-                              <span className={styles.email}>
+                              </Text>
+                              <Text fontSize="x-small" className={styles.email}>
                                 {keuring.adresID.klantID.emailadres}
-                              </span>
+                              </Text>
                             </div>
                           </Td>
                           <Td>
                             <div className={styles.adres}>
-                              <span className={styles.straat}>
+                              <Text fontSize="small" className={styles.straat}>
                                 {keuring.adresID.straatnaam +
                                   " " +
                                   keuring.adresID.nummer}
-                              </span>
-                              <span className={styles.gemeente}>
+                              </Text>
+                              <Text
+                                fontSize="x-small"
+                                className={styles.gemeente}
+                              >
                                 {keuring.adresID.gemeente}
-                              </span>
+                              </Text>
                             </div>
                           </Td>
-                          <Td>{keuring.type}</Td>
+                          <Td>
+                            <Text fontSize="small">{keuring.type}</Text>
+                          </Td>
                           <Td>
                             <div
                               className={styles.statusBgColor}
@@ -221,11 +227,13 @@ const Keuringen = () => {
                                 ),
                               }}
                             >
-                              {keuring.status +
-                                (keuring.status == Status.INGEPLAND
-                                  ? " -> " +
-                                    formatDate(keuring.datumPlaatsbezoek)
-                                  : "")}
+                              <Text fontSize="small">
+                                {keuring.status +
+                                  (keuring.status == Status.INGEPLAND
+                                    ? " -> " +
+                                      formatDate(keuring.datumPlaatsbezoek)
+                                    : "")}
+                              </Text>
                             </div>
                           </Td>
                           <Td>
@@ -247,7 +255,7 @@ const Keuringen = () => {
                     })}
                   </Tbody>
                 </Table>
-                <ButtonGroup css={{ marginTop: "20px" }}>
+                <ButtonGroup mt={5}>
                   <Button
                     className={styles.paginationButton}
                     onClick={() => handlePageChange(currentPage - 1)}

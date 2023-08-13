@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  height: 432px;
+  max-height: 216px;
   overflow-y: scroll;
   overflow-x: hidden;
   scrollbar-color: grey #e4e4e4;
@@ -16,10 +16,12 @@
 
 .content ul {
   margin: 0;
+  width: 100%;
 }
 
 .content li {
   display: flex;
+  width: 100%;
   padding: 15px 0;
   border-bottom: solid 2px rgb(104 112 118 / 0.08);
 }
@@ -34,13 +36,12 @@
 
 .documentInfo {
   display: flex;
-  width: 300px;
+  width: 100%;
   align-items: center;
 }
 
 .documentName {
   height: 24px;
-  width: 175px;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
@@ -59,10 +60,5 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 75px;
-}
-
-.content p {
-  text-align: center;
-  width: 300px;
+  margin-bottom: 5px;
 }

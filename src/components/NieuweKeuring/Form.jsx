@@ -2,7 +2,7 @@ import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Facturatie from "@/models/Facturatie";
 import Status from "@/models/Status";
 import ToegangEenheid from "@/models/ToegangEenheid";
-import styles from "@/styles/nieuwekeuringform.module.css";
+import styles from "@/styles/form.module.css";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -39,6 +39,7 @@ import {
   Spacer,
   Stack,
   StackDivider,
+  Text,
   Textarea,
   Tooltip,
   useDisclosure,
@@ -85,6 +86,7 @@ const Form = () => {
     resetField,
     control,
     formState: { errors },
+    watch,
   } = useForm({
     defaultValues: {
       voornaam: "",
@@ -95,24 +97,22 @@ const Form = () => {
       nummer: "",
       postcode: "",
       gemeente: "",
-      facturatie: {
-        naar: Facturatie.IMMO,
-        voornaam: "",
-        familienaam: "",
-        email: "",
-        telefoonnummer: "",
-        straatnaam: "",
-        nummer: "",
-        postcode: "",
-        gemeente: "",
-      },
+      facturatie_naar: Facturatie.IMMO,
+      facturatie_voornaam: "",
+      facturatie_familienaam: "",
+      facturatie_email: "",
+      facturatie_telefoonnummer: "",
+      facturatie_straatnaam: "",
+      facturatie_nummer: "",
+      facturatie_postcode: "",
+      facturatie_gemeente: "",
       datumPlaatsbezoek: null,
       status: Status.NIEUW,
       zaakvoerder: "f3474995-7517-4640-beb9-30a522ee34c5",
-      certificaat: {
-        epc: null,
-        asbest: null,
-      },
+
+      certificaat_epc: null,
+      certificaat_asbest: null,
+
       extraDocumenten: [],
       toegang_eenheid: ToegangEenheid.KLANT,
       type: "",
@@ -151,39 +151,39 @@ const Form = () => {
     const { data: facturatieData, error: facturatieError } = await supabase
       .from("Facturatie")
       .insert({
-        naar: getValues("facturatie.naar"),
+        naar: getValues("facturatie_naar"),
         voornaam:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? getValues("voornaam")
-            : getValues("facturatie.voornaam"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? getValues("facturatie_voornaam")
+            : null,
         familienaam:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? getValues("familienaam")
-            : getValues("facturatie.familienaam"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? getValues("facturatie_familienaam")
+            : null,
         emailadres:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? getValues("email")
-            : getValues("facturatie.email"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? getValues("facturatie_email")
+            : null,
         telefoonnummer:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? getValues("telefoonnummer")
-            : getValues("facturatie.telefoonnummer"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? getValues("facturatie_telefoonnummer")
+            : null,
         straatnaam:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? getValues("straatnaam")
-            : getValues("facturatie.straatnaam"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? getValues("facturatie_straatnaam")
+            : null,
         nummer:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? +getValues("nummer")
-            : +getValues("facturatie.nummer"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? +getValues("facturatie_nummer")
+            : null,
         postcode:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? +getValues("postcode")
-            : +getValues("facturatie.postcode"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? +getValues("facturatie_postcode")
+            : null,
         gemeente:
-          getValues("facturatie.naar") == Facturatie.HETZELFDE
-            ? getValues("gemeente")
-            : getValues("facturatie.gemeente"),
+          getValues("facturatie_naar") == Facturatie.ANDERS
+            ? getValues("facturatie_gemeente")
+            : null,
       })
       .select();
 
@@ -200,11 +200,11 @@ const Form = () => {
           {
             straatnaam: getValues("straatnaam"),
             nummer: getValues("nummer"),
-            postcode: +getValues("postcode"),
+            postcode: getValues("postcode"),
             gemeente: getValues("gemeente"),
             klantID: klantID,
             isFacturatieAdres:
-              getValues("facturatie.naar") == Facturatie.HETZELFDE
+              getValues("facturatie_naar") == Facturatie.HETZELFDE
                 ? true
                 : false,
           },
@@ -251,7 +251,7 @@ const Form = () => {
                 format: extraDocument.format,
                 name: extraDocument.name,
                 size: extraDocument.size,
-                cldnry_id: extraDocument.id,
+                cldnry_id: extraDocument.cldnry_id,
                 keuringID: keuringID,
               })
               .select();
@@ -283,13 +283,9 @@ const Form = () => {
           }}
         />
       </Tooltip>
-      <Modal onClose={onFormClose} isOpen={isFormOpen}>
+      <Modal onClose={onFormClose} isOpen={isFormOpen} size="full">
         <ModalOverlay />
-        <ModalContent maxW={1600} margin="auto">
-          <ModalHeader className={styles.modalHeader}>
-            Nieuwe keuring
-          </ModalHeader>
-          <ModalCloseButton />
+        <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalBody>
               <Grid
@@ -307,22 +303,28 @@ const Form = () => {
                     <CardBody>
                       <Stack divider={<StackDivider />} spacing={3}>
                         <Box>
-                          <Heading size="md" mb={5}>
+                          <Heading size="sm" mb={5}>
                             Klant
                           </Heading>
                           <List>
                             <ListItem className={styles.klant}>
                               <MdPerson
-                                size={30}
-                                style={{ margin: "5px 30px 5px 10px" }}
+                                size={32}
+                                style={{
+                                  marginLeft: "10px",
+                                  marginRight: "30px",
+                                }}
                               />
-                              <InputGroup gap="15px" flexDirection="column">
+                              <InputGroup
+                                gap="15px"
+                                flexDirection="column"
+                                size="sm"
+                              >
                                 <Input
                                   {...register("voornaam", {
                                     required: true,
                                   })}
                                   placeholder="Voornaam"
-                                  fontSize="16px"
                                 />
 
                                 <Input
@@ -330,44 +332,46 @@ const Form = () => {
                                     required: true,
                                   })}
                                   placeholder="Familienaam"
-                                  fontSize="16px"
                                 />
                               </InputGroup>
                             </ListItem>
                             <ListItem className={styles.klant}>
                               <MdAlternateEmail
-                                size={30}
-                                style={{ margin: "5px 30px 5px 10px" }}
+                                size={32}
+                                style={{
+                                  marginLeft: "10px",
+                                  marginRight: "30px",
+                                }}
                               />
-
                               <Box width="100%">
                                 <Input
                                   {...register("email", {
                                     pattern: { value: /\S+@\S+\.\S+/ },
                                   })}
                                   placeholder="E-mail"
-                                  fontSize="16px"
+                                  size="sm"
                                 />
                               </Box>
                             </ListItem>
                             <ListItem className={styles.klant}>
                               <MdPhone
-                                size={30}
-                                style={{ margin: "5px 30px 5px 10px" }}
+                                size={32}
+                                style={{
+                                  marginLeft: "10px",
+                                  marginRight: "30px",
+                                }}
                               />
-
                               <Box width="100%">
-                                <InputGroup>
-                                  {/* eslint-disable-next-line react/no-children-prop */}
-                                  <InputLeftAddon children="+32" />
+                                <InputGroup size="sm">
+                                  <InputLeftAddon>+32</InputLeftAddon>
                                   <Input
                                     {...register("telefoonnummer", {
+                                      required: true,
                                       pattern:
-                                        /^(?:(?:\+?\d{1,3})?[-. ]?)?\(?\d{1,}\)?[-. ]?\d+[-. ]?\d+$/,
+                                        /^(?:(?:(?:\+|00)32\s?|0)(?:4[789]\d|9\d)(?:\s?\d{2}){3}|(?:(?:\+|00)32\s?|0)(?:\d\s?\d{3}|\d{2}\s?\d{2})(?:\s?\d{2}){2})$/,
                                     })}
                                     placeholder="Telefoonnummer"
                                     type="tel"
-                                    fontSize="16px"
                                   />
                                 </InputGroup>
                               </Box>
@@ -376,40 +380,44 @@ const Form = () => {
                         </Box>
 
                         <Box>
-                          <Heading size="md" mb={3} mt={2}>
+                          <Heading size="sm" mb={3} mt={2}>
                             Adres
                           </Heading>
                           <List>
                             <ListItem className={styles.klant}>
                               <MdHome
-                                size={30}
-                                style={{ margin: "5px 30px 5px 10px" }}
+                                size={32}
+                                style={{
+                                  marginLeft: "10px",
+                                  marginRight: "30px",
+                                }}
                               />
-                              <InputGroup gap={2}>
+                              <InputGroup gap={2} size="sm">
                                 <Input
                                   width="75%"
                                   {...register("straatnaam", {
                                     required: true,
                                   })}
                                   placeholder="Straat"
-                                  fontSize="16px"
                                 />
 
                                 <Input
                                   {...register("nummer", { required: true })}
                                   width="25%"
                                   placeholder="Nr"
-                                  fontSize="16px"
                                 />
                               </InputGroup>
                             </ListItem>
                             <ListItem className={styles.klant}>
                               <MdLocationCity
-                                size={30}
-                                style={{ margin: "5px 30px 5px 10px" }}
+                                size={32}
+                                style={{
+                                  marginLeft: "10px",
+                                  marginRight: "30px",
+                                }}
                               />
 
-                              <InputGroup gap={2}>
+                              <InputGroup gap={2} size="sm">
                                 <Input
                                   {...register("postcode", {
                                     required: true,
@@ -417,13 +425,11 @@ const Form = () => {
                                   })}
                                   width="30%"
                                   placeholder="Postcode"
-                                  fontSize="16px"
                                 />
                                 <Input
                                   {...register("gemeente", { required: true })}
                                   width="70%"
                                   placeholder="Gemeente"
-                                  fontSize="16px"
                                 />
                               </InputGroup>
                             </ListItem>
@@ -447,7 +453,7 @@ const Form = () => {
                 >
                   <Card padding="5px 10px 0 10px" height="100%">
                     <CardHeader padding="20px">
-                      <Heading size="md">Extra documenten</Heading>
+                      <Heading size="sm">Extra documenten</Heading>
                     </CardHeader>
                     <CardBody>
                       <ExtraDocumentenDropzone
@@ -456,6 +462,7 @@ const Form = () => {
                         text="Sleep hier afbeeldingen/PDF-bestanden naartoe, of klik om ze te selecteren."
                         setValue={setValue}
                         getValues={getValues}
+                        extraDocumenten={getValues("extraDocumenten")}
                       />
                     </CardBody>
                   </Card>
@@ -475,7 +482,7 @@ const Form = () => {
                     >
                       <Box paddingRight={5}>
                         <CardHeader padding="20px">
-                          <Heading size="md">Toegang eenheid</Heading>
+                          <Heading size="sm">Toegang eenheid</Heading>
                         </CardHeader>
                         <CardBody padding={0} className={styles.cardBody}>
                           <Controller
@@ -486,6 +493,7 @@ const Form = () => {
                                 onChange={(value) => field.onChange(value)}
                                 value={field.value}
                                 ml={5}
+                                size="sm"
                               >
                                 <Stack ml={15} gap={0}>
                                   <Radio
@@ -508,10 +516,14 @@ const Form = () => {
                       </Box>
                       <Box paddingLeft={5}>
                         <CardHeader padding="20px 0">
-                          <Heading size="md">Type</Heading>
+                          <Heading size="sm">Type</Heading>
                         </CardHeader>
                         <CardBody padding={0} className={styles.cardBody}>
-                          <CheckboxTypeKeuring control={control} />
+                          <CheckboxTypeKeuring
+                            control={control}
+                            setValue={setValue}
+                            getValues={getValues}
+                          />
                         </CardBody>
                       </Box>
                     </Stack>
@@ -525,12 +537,11 @@ const Form = () => {
                 >
                   <Card padding="5px 10px 0 10px" height="100%">
                     <CardHeader padding="20px">
-                      <Heading size="md">Extra opmerkingen</Heading>
+                      <Heading size="sm">Extra opmerkingen</Heading>
                     </CardHeader>
                     <CardBody pt={0}>
                       <Textarea
                         width="100%"
-                        fontSize="16px"
                         padding="10px"
                         resize="none"
                         borderRadius="5px"

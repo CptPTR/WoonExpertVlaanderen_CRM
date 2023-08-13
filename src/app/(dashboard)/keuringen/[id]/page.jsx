@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "@/app/(dashboard)/keuringen/[id]/keuring.module.css";
+import CertificateName from "@/components/CertificateName";
 import EditForm from "@/components/EditKeuring/EditForm";
 import { getBackgroundStatusColor } from "@/helpers/helpers";
 import Facturatie from "@/models/Facturatie";
@@ -21,6 +22,7 @@ import {
   IconButton,
   List,
   ListItem,
+  Spacer,
   Tag,
   TagLabel,
   Text,
@@ -29,7 +31,6 @@ import {
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Image } from "cloudinary-react";
-import { Roboto } from "next/font/google";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaHandshake, FaRegFilePdf } from "react-icons/fa";
@@ -38,20 +39,19 @@ import {
   MdAlternateEmail,
   MdDelete,
   MdDownload,
-  MdEmail,
   MdHome,
   MdLocationCity,
   MdPerson,
   MdPhone,
 } from "react-icons/md";
 
-const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
-
 const Keuring = ({ params }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const [keuring, setKeuring] = useState(null);
   const [extraDocumenten, setExtraDocumenten] = useState([]);
+  const [certificaatEPC, setCertificaatEPC] = useState();
+  const [certificaatAsbest, setCertificaatAsbest] = useState();
 
   const router = useRouter();
   const supabase = createClientComponentClient({
@@ -78,9 +78,27 @@ const Keuring = ({ params }) => {
 
       setExtraDocumenten(extraDocumentenData);
     };
+    const getCertificatenData = async () => {
+      let { data: certificatenData, error: certificatenError } = await supabase
+        .from("Certificaat")
+        .select("*")
+        .eq("keuringID", params.id);
+
+      const certificaatEPC = certificatenData.filter(
+        (certificaat) => certificaat.type == TypeKeuring.EPC
+      );
+      const certificaatAsbest = certificatenData.filter(
+        (certificaat) => certificaat.type == TypeKeuring.ASBEST
+      );
+      console.log(certificaatEPC);
+      console.log(certificaatAsbest);
+      // setCertificaatEPC(certificaatEPC[0].name);
+      // setCertificaatAsbest(certificaatAsbest[0].name);
+    };
 
     getKeuringData();
     getExtraDocumentenData();
+    getCertificatenData();
   }, [params.id, supabase]);
 
   const handleDeleteKeuring = async () => {
@@ -137,7 +155,29 @@ const Keuring = ({ params }) => {
     }
   };
 
-  const downloadFile = () => {};
+  const downloadFile = async (cldnry_id, filename) => {
+    try {
+      const response = await fetch(
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${cldnry_id}`
+      );
+      if (response.ok) {
+        const blob = await response.blob();
+
+        const contentType = response.headers.get("Content-Type");
+        const format = contentType.split("/")[1];
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${filename}.${format}`;
+        link.click();
+      } else {
+        console.error("Failed to download image.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <Box display="flex" flexDirection="column">
@@ -145,46 +185,34 @@ const Keuring = ({ params }) => {
         <header className={styles.header}>
           <Box display="flex" alignItems="center">
             <FaArrowLeft
-              size={30}
+              size={28}
               onClick={() => router.back()}
               className={styles.backBtn}
             />
-            <h1 className={`${roboto900.className} ${styles.title}`}>
+            <Heading size="md" ml={3}>
               KEURING
-            </h1>
+            </Heading>
           </Box>
           <Box display="flex">
             <Tooltip label={keuring.toegang_eenheid} placement="bottom-end">
-              <Tag
-                className={styles.tag}
-                variant="solid"
-                bgColor="black"
-                color="white"
-              >
+              <Tag variant="solid" bgColor="black" color="white">
                 <TagLabel>
                   {keuring.toegang_eenheid == ToegangEenheid.KLANT ? (
-                    <FaHandshake size={30} />
+                    <FaHandshake size={24} />
                   ) : (
-                    <GiHouseKeys size={30} />
+                    <GiHouseKeys size={24} />
                   )}
                 </TagLabel>
               </Tag>
             </Tooltip>
-            <Tag
-              size="lg"
-              className={styles.tag}
-              variant="solid"
-              bgColor="blackAlpha.700"
-              color="white"
-            >
+            <Tag variant="solid" bgColor="blackAlpha.700" color="white" ml={2}>
               <TagLabel>{keuring.type}</TagLabel>
             </Tag>
             <Tag
-              size="lg"
-              className={styles.tag}
               variant="solid"
               bgColor={getBackgroundStatusColor(keuring)}
               color="white"
+              ml={2}
             >
               <TagLabel>
                 {keuring.status +
@@ -198,8 +226,7 @@ const Keuring = ({ params }) => {
               <IconButton
                 size="lg"
                 icon={<MdDelete />}
-                ml="10px"
-                className={styles.keuringStatus}
+                ml={2}
                 onClick={onOpen}
               />
             </Tooltip>
@@ -211,7 +238,7 @@ const Keuring = ({ params }) => {
             >
               <AlertDialogOverlay>
                 <AlertDialogContent>
-                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  <AlertDialogHeader fontWeight="bold">
                     Keuring verwijderen
                   </AlertDialogHeader>
                   <AlertDialogBody>
@@ -224,7 +251,7 @@ const Keuring = ({ params }) => {
                     <Button
                       bgColor="red"
                       color="white"
-                      ml={3}
+                      ml={2}
                       onClick={handleDeleteKeuring}
                     >
                       Verwijder Keuring
@@ -237,33 +264,33 @@ const Keuring = ({ params }) => {
         </header>
       )}
       <main className={styles.main}>
-        <Text className={styles.ref}>Ref: {keuring?.id}</Text>
         <div className={styles.keuringContainer}>
           <Box display="flex" gap="20px">
             <Box className={styles.cardBox} width="fit-content">
               <Box className={styles.box}>
-                <Heading size="md">Klant</Heading>
-                <List mt={10}>
+                <Heading size="sm">Klant</Heading>
+                <List mt={5}>
                   {keuring && (
                     <>
-                      <ListItem className={styles.klant}>
+                      <ListItem className={styles.klant} fontSize="sm">
                         <MdPerson size={24} style={{ margin: "0 20px" }} />
-                        <Text>
-                          {keuring.adresID?.klantID?.voornaam +
-                            " " +
-                            keuring.adresID?.klantID?.familienaam}
-                        </Text>
+                        {/* <Text fontSize="sm"> */}
+                        {keuring.adresID?.klantID?.voornaam +
+                          " " +
+                          keuring.adresID?.klantID?.familienaam}
+                        {/* </Text> */}
                       </ListItem>
-                      <ListItem className={styles.klant}>
+                      <ListItem className={styles.klant} fontSize="sm">
                         <MdAlternateEmail
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        <Text>{keuring.adresID?.klantID?.emailadres}</Text>
+
+                        {keuring.adresID?.klantID?.emailadres}
                       </ListItem>
-                      <ListItem className={styles.klant}>
+                      <ListItem className={styles.klant} fontSize="sm">
                         <MdPhone size={24} style={{ margin: "0 20px" }} />
-                        <Text>{keuring.adresID?.klantID?.telefoonnummer}</Text>
+                        {keuring.adresID?.klantID?.telefoonnummer}
                       </ListItem>
                     </>
                   )}
@@ -271,28 +298,24 @@ const Keuring = ({ params }) => {
               </Box>
               <Divider />
               <Box className={styles.box}>
-                <Heading size="md">Adres</Heading>
-                <List mt={10}>
+                <Heading size="sm">Adres</Heading>
+                <List mt={5}>
                   {keuring && (
                     <>
-                      <ListItem className={styles.adres}>
+                      <ListItem className={styles.adres} fontSize="sm">
                         <MdHome size={24} style={{ margin: "0 20px" }} />
-                        <Text>
-                          {keuring.adresID?.straatnaam +
-                            " " +
-                            keuring.adresID?.nummer}
-                        </Text>
+                        {keuring.adresID?.straatnaam +
+                          " " +
+                          keuring.adresID?.nummer}
                       </ListItem>
-                      <ListItem className={styles.adres}>
+                      <ListItem className={styles.adres} fontSize="sm">
                         <MdLocationCity
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        <Text>
-                          {keuring.adresID?.postcode +
-                            " " +
-                            keuring.adresID?.gemeente}
-                        </Text>
+                        {keuring.adresID?.postcode +
+                          " " +
+                          keuring.adresID?.gemeente}
                       </ListItem>
                     </>
                   )}
@@ -300,82 +323,84 @@ const Keuring = ({ params }) => {
               </Box>
               <Divider />
               <Box className={styles.box}>
-                <Heading size="md">Facturatie</Heading>
+                <Heading size="sm" mb={5}>
+                  Facturatie
+                </Heading>
                 {keuring?.facturatieID.naar !== Facturatie.ANDERS ? (
-                  <Text mt={10} ml="24px">
+                  <Text ml="24px">
                     {keuring?.facturatieID.naar == Facturatie.IMMO
                       ? `${keuring?.facturatieID.naar} - ${keuring?.created_by.ondernemingID.naam}`
                       : keuring?.facturatieID.naar}
                   </Text>
                 ) : null}
 
-                <Text mt={10}>
-                  {keuring?.facturatieID.naar == Facturatie.ANDERS ? (
-                    <>
-                      <List>
-                        <ListItem className={styles.klant}>
-                          <MdPerson size={24} style={{ margin: "0 20px" }} />
-                          {keuring.facturatieID.voornaam}{" "}
-                          {keuring.facturatieID.familienaam}
-                        </ListItem>
-                        <ListItem className={styles.klant}>
-                          <MdAlternateEmail
-                            size={24}
-                            style={{ margin: "0 20px" }}
-                          />
-                          {keuring.facturatieID.emailadres}
-                        </ListItem>
-                        <ListItem className={styles.klant}>
-                          <MdPhone size={24} style={{ margin: "0 20px" }} />
-                          {keuring.facturatieID.telefoonnummer}
-                        </ListItem>
-                        <ListItem className={styles.klant}>
-                          <MdHome size={24} style={{ margin: "0 20px" }} />
-                          <Text>{`${keuring.facturatieID.straatnaam} ${keuring.facturatieID.nummer}`}</Text>
-                        </ListItem>
-                        <ListItem className={styles.klant}>
-                          <MdLocationCity
-                            size={24}
-                            style={{ margin: "0 20px" }}
-                          />
-                          <Text>
-                            {`${keuring.facturatieID.postcode} ${keuring.facturatieID.gemeente}`}
-                          </Text>
-                        </ListItem>
-                      </List>
-                    </>
-                  ) : null}
-                </Text>
+                {keuring?.facturatieID.naar == Facturatie.ANDERS ? (
+                  <>
+                    <List>
+                      <ListItem className={styles.klant} fontSize="sm">
+                        <MdPerson size={24} style={{ margin: "0 20px" }} />
+                        {keuring.facturatieID.voornaam}{" "}
+                        {keuring.facturatieID.familienaam}
+                      </ListItem>
+                      <ListItem className={styles.klant} fontSize="sm">
+                        <MdAlternateEmail
+                          size={24}
+                          style={{ margin: "0 20px" }}
+                        />
+                        {keuring.facturatieID.emailadres}
+                      </ListItem>
+                      <ListItem className={styles.klant} fontSize="sm">
+                        <MdPhone size={24} style={{ margin: "0 20px" }} />
+                        {keuring.facturatieID.telefoonnummer}
+                      </ListItem>
+                      <ListItem className={styles.klant} fontSize="sm">
+                        <MdHome size={24} style={{ margin: "0 20px" }} />
+                        <Text>{`${keuring.facturatieID.straatnaam} ${keuring.facturatieID.nummer}`}</Text>
+                      </ListItem>
+                      <ListItem className={styles.klant} fontSize="sm">
+                        <MdLocationCity
+                          size={24}
+                          style={{ margin: "0 20px" }}
+                        />
+                        <Text>
+                          {`${keuring.facturatieID.postcode} ${keuring.facturatieID.gemeente}`}
+                        </Text>
+                      </ListItem>
+                    </List>
+                  </>
+                ) : null}
               </Box>
             </Box>
             <Box className={styles.cardBox} width="100%" position="relative">
               <Box className={styles.box}>
-                <div className={styles.editIconsContainer}>
-                  <Tooltip
-                    label="Download alle documenten"
-                    placement="bottom-end"
-                  >
-                    <div className={styles.editIconContainer}>
-                      <MdDownload size={24} />
-                    </div>
-                  </Tooltip>
-                  <Tooltip
-                    label="Verwijder alle documenten"
-                    placement="bottom-end"
-                  >
-                    <div
-                      className={styles.editIconContainer}
-                      onClick={() => removeFiles("extradocs")}
+                {extraDocumenten?.length > 0 ? (
+                  <Box className={styles.editIconContainer}>
+                    <Tooltip
+                      label="Download alle documenten"
+                      placement="bottom-end"
                     >
-                      <MdDelete className={styles.editIcon} size={24} />
-                    </div>
-                  </Tooltip>
-                </div>
-                <Heading size="md">Extra documenten</Heading>
+                      <Box className={styles.editIcon}>
+                        <MdDownload size={21} />
+                      </Box>
+                    </Tooltip>
+                    <Tooltip
+                      label="Verwijder alle documenten"
+                      placement="bottom-end"
+                    >
+                      <Box
+                        className={styles.editIcon}
+                        onClick={() => removeFiles("extradocs")}
+                      >
+                        <MdDelete size={21} />
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                ) : null}
+                <Heading size="sm">Extra documenten</Heading>
                 {extraDocumenten?.length > 0 ? (
                   <List
                     mt="20px"
-                    height="210px"
+                    maxHeight="210px"
                     overflowY={extraDocumenten.length > 3 ? "scroll" : "auto"}
                   >
                     {extraDocumenten?.map((extraDoc) => (
@@ -399,22 +424,28 @@ const Keuring = ({ params }) => {
                             scrop="scale"
                           />
                         ) : (
-                          <FaRegFilePdf size={48} color="#F40F02" />
+                          <FaRegFilePdf size={32} color="#F40F02" />
                         )}
-                        <Text ml={5}>{extraDoc.name}</Text>
-                        <Text ml="auto" mr={5}>
+                        <Text fontSize="sm" ml={5}>
+                          {extraDoc.name}.{extraDoc.format}
+                        </Text>
+                        <Spacer />
+
+                        <Text fontSize="sm" ml="auto" mr={5}>
                           {formatFileSize(extraDoc.size)}
                         </Text>
                         <Tooltip
                           label="Download document"
                           placement="bottom-start"
                         >
-                          <div
-                            className={styles.editIconContainer}
-                            onClick={() => downloadFile()}
+                          <Box
+                            className={styles.editIcon}
+                            onClick={() =>
+                              downloadFile(extraDoc.cldnry_id, extraDoc.name)
+                            }
                           >
-                            <MdDownload size={24} />
-                          </div>
+                            <MdDownload />
+                          </Box>
                         </Tooltip>
                       </ListItem>
                     ))}
@@ -433,22 +464,22 @@ const Keuring = ({ params }) => {
               </Box>
               <Divider />
               <Box className={styles.box}>
-                <div className={styles.editIconsContainer}>
+                <div className={styles.editIconContainer}>
                   <Tooltip label="Download certificaat" placement="bottom-end">
-                    <div className={styles.editIconContainer}>
-                      <MdDownload size={24} />
-                    </div>
+                    <Box className={styles.editIcon}>
+                      <MdDownload size={21} />
+                    </Box>
                   </Tooltip>
                   <Tooltip label="Verwijder certificaat" placement="bottom-end">
-                    <div
-                      className={styles.editIconContainer}
+                    <Box
+                      className={styles.editIcon}
                       onClick={() => removeFiles("certificaat")}
                     >
-                      <MdDelete className={styles.editIcon} size={24} />
-                    </div>
+                      <MdDelete size={21} />
+                    </Box>
                   </Tooltip>
                 </div>
-                <Heading size="md">Certificaat</Heading>
+                <Heading size="sm">Certificaat</Heading>
                 {keuring?.type !== TypeKeuring.ASBEST ? (
                   <Box
                     display="flex"
@@ -457,21 +488,23 @@ const Keuring = ({ params }) => {
                     pl={5}
                     height="50px"
                   >
-                    <FaRegFilePdf size={48} color="#F40F02" />
-                    <Text ml={5}>EPC Certicaat - ...</Text>
-                    <Text ml="auto" mr={5}>
+                    <FaRegFilePdf size={32} color="#F40F02" />
+                    <Text fontSize="sm" ml={5}>
+                      EPC Certicaat - ...
+                    </Text>
+                    <Text fontSize="sm" ml="auto" mr={5}>
                       {formatFileSize(10000)}
                     </Text>
                     <Tooltip
                       label="Download EPC certificaat"
                       placement="bottom-start"
                     >
-                      <div
-                        className={styles.editIconContainer}
+                      <Box
+                        className={styles.editIcon}
                         onClick={() => downloadFile()}
                       >
-                        <MdDownload size={24} />
-                      </div>
+                        <MdDownload />
+                      </Box>
                     </Tooltip>
                   </Box>
                 ) : null}
@@ -483,30 +516,40 @@ const Keuring = ({ params }) => {
                     pl={5}
                     height="50px"
                   >
-                    <FaRegFilePdf size={48} color="#F40F02" />
-                    <Text ml={5}>Asbest Certicaat - ...</Text>
-                    <Text ml="auto" mr={5}>
+                    <FaRegFilePdf size={32} color="#F40F02" />
+                    <Text fontSize="sm" ml={5}>
+                      Asbest Certicaat - ...
+                    </Text>
+                    <Text>{certificaatEPC}</Text>
+
+                    <Text fontSize="sm" ml="auto" mr={5}>
                       {formatFileSize(10000)}
                     </Text>
                     <Tooltip
                       label="Download asbest certificaat"
                       placement="bottom-start"
                     >
-                      <div
-                        className={styles.editIconContainer}
+                      <Box
+                        className={styles.editIcon}
                         onClick={() => downloadFile()}
                       >
-                        <MdDownload size={24} />
-                      </div>
+                        <MdDownload />
+                      </Box>
                     </Tooltip>
                   </Box>
                 ) : null}
               </Box>
               <Divider />
               <Box className={styles.box}>
-                <Heading size="md">Extra opmerkingen</Heading>
+                <Heading size="sm">Extra opmerkingen</Heading>
                 {/* 140px */}
-                <Text height={"100px"} className={styles.opmerking} mt={5}>
+                <Text
+                  fontSize="sm"
+                  minHeight={100}
+                  maxHeight={120}
+                  className={styles.opmerking}
+                  mt={10}
+                >
                   {keuring?.opmerking || "Geen opmerkingen"}
                 </Text>
               </Box>

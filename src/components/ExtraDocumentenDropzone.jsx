@@ -1,9 +1,8 @@
-import { useDropzone } from "react-dropzone";
-
 import styles from "@/styles/dropzone.module.css";
-import { List, ListItem, Spacer, Tooltip } from "@chakra-ui/react";
+import { List, ListItem, Spacer, Text } from "@chakra-ui/react";
 import { Image } from "cloudinary-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useDropzone } from "react-dropzone";
 import { FaRegFilePdf } from "react-icons/fa";
 
 const baseStyle = {
@@ -31,17 +30,8 @@ const ExtraDocumentenDropzone = ({
   getValues,
   acceptFileType,
   multipleFiles,
+  extraDocumenten,
 }) => {
-  const [uploadedDocuments, setUploadedDocuments] = useState([]);
-
-  useEffect(() => {
-    const formValues = getValues("extraDocumenten");
-
-    uploadedDocuments.map((doc) => {
-      setValue("extraDocumenten", [...formValues, doc]);
-    });
-  }, [getValues, setValue, uploadedDocuments]);
-
   const getFileAcceptValue = () => {
     if (acceptFileType === "images") {
       return {
@@ -69,14 +59,19 @@ const ExtraDocumentenDropzone = ({
       });
       const data = await response.json();
 
+      console.log("UPLOADED doc:", data);
       const newDocument = {
-        id: data.public_id,
+        // id: data.public_id,
         format: data.format,
         name: data.original_filename,
         size: data.bytes,
+        cldnry_id: data.public_id,
       };
 
-      setUploadedDocuments((prevDocuments) => [...prevDocuments, newDocument]);
+      setValue("extraDocumenten", [
+        ...getValues("extraDocumenten"),
+        newDocument,
+      ]);
     }
   };
 
@@ -116,30 +111,27 @@ const ExtraDocumentenDropzone = ({
       <div {...getRootProps({ style })} className={styles.dropzone}>
         <input {...getInputProps()} />
         <div className={styles.dzone}>
-          <div className={styles.icon}>
-            <FaRegFilePdf size={48} color="#F40F02" />
-          </div>
           {isDragActive ? (
-            <p>Drop the files here...</p>
+            <Text fontSize="sm">Drop the files here...</Text>
           ) : (
-            <p>
-              Sleep hier afbeeldingen/PDF-bestanden naartoe, of klik om ze te
-              selecteren.
-            </p>
+            <Text fontSize="sm">
+              Sleep hier afbeeldingen/PDF-bestanden naartoe, of klik hier om ze
+              te selecteren.
+            </Text>
           )}
         </div>
       </div>
-      {uploadedDocuments.length > 0 && (
+      {extraDocumenten?.length > 0 && (
         <div className={styles.content}>
           <List mt={10}>
-            {uploadedDocuments.map((document, index) => (
+            {extraDocumenten.map((document, index) => (
               <ListItem key={document.id}>
                 <div className={styles.imageContainer}>
                   {document.format !== "pdf" ? (
                     <Image
                       alt=""
                       cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
-                      publicId={document.id}
+                      publicId={document.cldnry_id}
                       width="30"
                       height="30"
                       scrop="scale"
@@ -150,12 +142,14 @@ const ExtraDocumentenDropzone = ({
                 </div>
 
                 <div className={styles.documentInfo}>
-                  <span className={styles.documentName}>{document.name}</span>
+                  <Text fontSize="sm" className={styles.documentName}>
+                    {document.name}
+                  </Text>
 
                   <Spacer />
-                  <span className={styles.documentSize}>
+                  <Text fontSize="sm" className={styles.documentSize}>
                     {formatFileSize(document.size)}
-                  </span>
+                  </Text>
                 </div>
               </ListItem>
             ))}

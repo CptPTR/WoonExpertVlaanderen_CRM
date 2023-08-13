@@ -1,5 +1,5 @@
 import Facturatie from "@/models/Facturatie";
-import styles from "@/styles/nieuwekeuringform.module.css";
+import styles from "@/styles/form.module.css";
 import {
   Box,
   Card,
@@ -44,17 +44,17 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
 
     if (currentFacturatieNaar !== Facturatie.ANDERS) {
       fieldsToReset.forEach((field) => {
-        resetField(`facturatie.${field}`);
+        resetField(`facturatie_${field}`);
       });
     } else {
       fieldsToReset.forEach((field) => {
-        setValue(`facturatie.${field}`, formValues(field));
+        setValue(`facturatie_${field}`, formValues(field));
       });
     }
   }, [currentFacturatieNaar, formValues, resetField, setValue]);
 
   useEffect(() => {
-    setValue("facturatie.naar", currentFacturatieNaar);
+    setValue("facturatie_naar", currentFacturatieNaar);
   }, [currentFacturatieNaar, setValue]);
 
   const handleRadioChange = (e) => {
@@ -70,10 +70,11 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
     >
       <Card padding="5px 10px 0 10px" height="100%">
         <CardHeader padding="20px">
-          <Heading size="md">Facturatie</Heading>
+          <Heading size="sm">Facturatie</Heading>
         </CardHeader>
         <CardBody>
           <RadioGroup
+            size="sm"
             colorScheme="green"
             defaultValue={Facturatie.IMMO}
             pl={5}
@@ -105,19 +106,24 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
 
           <List>
             <ListItem className={styles.klant}>
-              <MdPerson size={30} style={{ margin: "5px 30px 5px 10px" }} />
-              <InputGroup gap="15px" flexDirection="column">
+              <MdPerson
+                size={32}
+                style={{
+                  marginLeft: "10px",
+                  marginRight: "30px",
+                }}
+              />
+              <InputGroup gap="15px" flexDirection="column" size="sm">
                 <Input
-                  {...register("facturatie.voornaam")}
+                  {...register("facturatie_voornaam")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
                   placeholder="Voornaam"
-                  fontSize="16px"
                 />
 
                 <Input
-                  {...register("facturatie.familienaam")}
+                  {...register("facturatie_familienaam")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
@@ -127,19 +133,21 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                       : ""
                   }
                   placeholder="Familienaam"
-                  fontSize="16px"
                 />
               </InputGroup>
             </ListItem>
             <ListItem className={styles.klant}>
               <MdAlternateEmail
-                size={30}
-                style={{ margin: "5px 30px 5px 10px" }}
+                size={32}
+                style={{
+                  marginLeft: "10px",
+                  marginRight: "30px",
+                }}
               />
 
               <Box width="100%">
                 <Input
-                  {...register("facturatie.email")}
+                  {...register("facturatie_email")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
@@ -149,19 +157,23 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                       : ""
                   }
                   placeholder="E-mail"
-                  fontSize="16px"
+                  size="sm"
                 />
               </Box>
             </ListItem>
             <ListItem className={styles.klant}>
-              <MdPhone size={30} style={{ margin: "5px 30px 5px 10px" }} />
-
+              <MdPhone
+                size={32}
+                style={{
+                  marginLeft: "10px",
+                  marginRight: "30px",
+                }}
+              />
               <Box width="100%">
-                <InputGroup>
-                  {/* eslint-disable-next-line react/no-children-prop */}
-                  <InputLeftAddon children="+32" />
+                <InputGroup size="sm">
+                  <InputLeftAddon>+32</InputLeftAddon>
                   <Input
-                    {...register("facturatie.telefoonnummer")}
+                    {...register("facturatie_telefoonnummer")}
                     disabled={
                       currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                     }
@@ -171,17 +183,22 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                         : ""
                     }
                     placeholder="Telefoonnummer"
-                    fontSize="16px"
                   />
                 </InputGroup>
               </Box>
             </ListItem>
             <ListItem className={styles.klant}>
-              <MdHome size={30} style={{ margin: "5px 30px 5px 10px" }} />
-              <InputGroup gap={2}>
+              <MdHome
+                size={32}
+                style={{
+                  marginLeft: "10px",
+                  marginRight: "30px",
+                }}
+              />
+              <InputGroup gap={2} size="sm">
                 <Input
                   width="75%"
-                  {...register("facturatie.straatnaam")}
+                  {...register("facturatie_straatnaam")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
@@ -191,11 +208,10 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                       : ""
                   }
                   placeholder="Straat"
-                  fontSize="16px"
                 />
 
                 <Input
-                  {...register("facturatie.nummer")}
+                  {...register("facturatie_nummer")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
@@ -206,19 +222,21 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                   }
                   width="25%"
                   placeholder="Nr"
-                  fontSize="16px"
                 />
               </InputGroup>
             </ListItem>
             <ListItem className={styles.klant}>
               <MdLocationCity
-                size={30}
-                style={{ margin: "5px 30px 5px 10px" }}
+                size={32}
+                style={{
+                  marginLeft: "10px",
+                  marginRight: "30px",
+                }}
               />
 
-              <InputGroup gap={2}>
+              <InputGroup gap={2} size="sm">
                 <Input
-                  {...register("facturatie.postcode")}
+                  {...register("facturatie_postcode")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
@@ -229,11 +247,10 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                   }
                   width="30%"
                   placeholder="Postcode"
-                  fontSize="16px"
                 />
 
                 <Input
-                  {...register("facturatie.gemeente")}
+                  {...register("facturatie_gemeente")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
@@ -244,7 +261,6 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                   }
                   width="70%"
                   placeholder="Gemeente"
-                  fontSize="16px"
                 />
               </InputGroup>
             </ListItem>
