@@ -59,7 +59,7 @@ export default function Login() {
   return (
     <div className={styles.login}>
       <Image height={100} src={Logo} alt="Logo WoonExpertVlaanderen" priority />
-      <form>
+      <form onSubmit={handleSignIn}>
         <FormControl mt="50px" fontSize="14px" fontWeight="500">
           <FormLabel>E-mail</FormLabel>
           <Input
@@ -89,12 +89,7 @@ export default function Login() {
           </InputGroup>
           <Text>{passwordErrorMessage}</Text>
         </FormControl>
-        <Button
-          mt="30px"
-          width="100%"
-          colorScheme="green"
-          onClick={handleSignIn}
-        >
+        <Button mt="30px" width="100%" colorScheme="green" type="submit">
           Aanmelden
         </Button>
         <Box textAlign="center">

@@ -218,10 +218,10 @@ const EditForm = ({ id }) => {
         (certificaat) => certificaat.type == TypeKeuring.ASBEST
       );
 
-      console.log(certEPC);
-      console.log(certAsbest);
       if (certEPC[0]) {
         setValue("certificaat_epc", certEPC[0].id);
+      }
+      if (certAsbest[0]) {
         setValue("certificaat_asbest", certAsbest[0].id);
       }
     };
@@ -384,7 +384,6 @@ const EditForm = ({ id }) => {
 
     if (watchExtraDocumenten.length > 0) {
       if (keuringID) {
-        console.log(watchExtraDocumenten);
         watchExtraDocumenten.forEach(async (extraDocument) => {
           const { data: extraDocumentData, error: extraDocumentError } =
             await supabase
@@ -413,19 +412,26 @@ const EditForm = ({ id }) => {
     onFormClose();
   };
 
-  const handleDeleteCertOnClick = async (idCert) => {
+  const handleDeleteCertOnClick = async (idCert, typeRemoved) => {
     const { error: certificaatError } = await supabase
       .from("Certificaat")
       .delete()
       .eq("id", idCert);
 
     if (certificaatError) {
-      console.error("Error verwijderen van certificaat: ", certificaatError);
+      console.error(
+        "Error (EditForm) verwijderen van certificaat: ",
+        certificaatError
+      );
     } else {
-      console.log("DELETED");
-      watchType.includes(TypeKeuring.EPC)
-        ? setValue("certificaat_epc", "")
-        : setValue("certificaat_asbest", "");
+      switch (typeRemoved) {
+        case TypeKeuring.EPC:
+          setValue("certificaat_epc", "");
+          break;
+        case TypeKeuring.ASBEST:
+          setValue("certificaat_asbest", "");
+          break;
+      }
 
       router.refresh();
     }
@@ -442,9 +448,9 @@ const EditForm = ({ id }) => {
           onClick={() => onFormOpen()}
         />
       </Tooltip>
-      <Modal onClose={onFormClose} isOpen={isFormOpen} size="full">
+      <Modal onClose={onFormClose} isOpen={isFormOpen} size="6xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent my={6}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalBody>
               <Grid templateColumns="repeat(12, 1fr)" gap={3}>
@@ -754,7 +760,7 @@ const EditForm = ({ id }) => {
                           <AccordionIcon />
                         </AccordionButton>
                         <AccordionPanel>
-                          <CardBody>
+                          <CardBody padding={0}>
                             <ExtraDocumentenDropzone
                               acceptFileType="images"
                               multipleFiles
@@ -833,7 +839,10 @@ const EditForm = ({ id }) => {
                                     <IconButton
                                       size="sm"
                                       onClick={() =>
-                                        handleDeleteCertOnClick(watchCertEpc)
+                                        handleDeleteCertOnClick(
+                                          watchCertEpc,
+                                          TypeKeuring.EPC
+                                        )
                                       }
                                       icon={<MdDelete />}
                                     ></IconButton>
@@ -872,7 +881,10 @@ const EditForm = ({ id }) => {
                                     <IconButton
                                       size="sm"
                                       onClick={() =>
-                                        handleDeleteCertOnClick(watchCertAsbest)
+                                        handleDeleteCertOnClick(
+                                          watchCertAsbest,
+                                          TypeKeuring.ASBEST
+                                        )
                                       }
                                       icon={<MdDelete />}
                                     ></IconButton>

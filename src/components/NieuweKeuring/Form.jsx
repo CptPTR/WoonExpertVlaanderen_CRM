@@ -29,17 +29,14 @@ import {
   ListItem,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
-  ModalHeader,
   ModalOverlay,
   Radio,
   RadioGroup,
   Spacer,
   Stack,
   StackDivider,
-  Text,
   Textarea,
   Tooltip,
   useDisclosure,
@@ -283,7 +280,7 @@ const Form = () => {
           }}
         />
       </Tooltip>
-      <Modal onClose={onFormClose} isOpen={isFormOpen} size="full">
+      <Modal onClose={onFormClose} isOpen={isFormOpen} size="6xl">
         <ModalOverlay />
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -475,12 +472,8 @@ const Form = () => {
                   boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
                 >
                   <Card padding="5px 10px 0 10px" height="100%">
-                    <Stack
-                      height="100%"
-                      direction="row"
-                      divider={<Divider orientation="vertical" />}
-                    >
-                      <Box paddingRight={5}>
+                    <Stack height="100%" direction="row">
+                      <Box paddingRight={10}>
                         <CardHeader padding="20px">
                           <Heading size="sm">Toegang eenheid</Heading>
                         </CardHeader>
@@ -492,7 +485,6 @@ const Form = () => {
                               <RadioGroup
                                 onChange={(value) => field.onChange(value)}
                                 value={field.value}
-                                ml={5}
                                 size="sm"
                               >
                                 <Stack ml={15} gap={0}>
@@ -514,7 +506,7 @@ const Form = () => {
                           />
                         </CardBody>
                       </Box>
-                      <Box paddingLeft={5}>
+                      <Box>
                         <CardHeader padding="20px 0">
                           <Heading size="sm">Type</Heading>
                         </CardHeader>

@@ -25,29 +25,34 @@ const CheckboxTypeKeuring = ({ control, typeKeuring, setValue, getValues }) => {
 
   useEffect(() => {
     const deleteCertificaat = async (typeCert) => {
-      const { error: certificaatError } = await supabase
-        .from("Certificaat")
-        .delete()
-        .eq(
-          "id",
-          typeCert == TypeKeuring.EPC
-            ? getValues("certificaat_epc")
-            : getValues("certificaat_asbest")
-        );
+      if (typeCert) {
+        const { error: certificaatError } = await supabase
+          .from("Certificaat")
+          .delete()
+          .eq(
+            "id",
+            typeCert == TypeKeuring.EPC
+              ? getValues("certificaat_epc")
+              : getValues("certificaat_asbest")
+          );
 
-      if (certificaatError) {
-        console.error("Error verwijderen van certificaat: ", certificaatError);
+        if (certificaatError) {
+          console.error(
+            "Error (CheckboxTypeKeuring) verwijderen van certificaat: ",
+            certificaatError
+          );
+        }
+      }
+
+      if (!selectedValues.includes(TypeKeuring.EPC)) {
+        deleteCertificaat(TypeKeuring.EPC);
+        setValue("certificaat_epc", "");
+      }
+      if (!selectedValues.includes(TypeKeuring.ASBEST)) {
+        deleteCertificaat(TypeKeuring.ASBEST);
+        setValue("certificaat_asbest", "");
       }
     };
-
-    if (!selectedValues.includes(TypeKeuring.EPC)) {
-      deleteCertificaat(TypeKeuring.EPC);
-      setValue("certificaat_epc", "");
-    }
-    if (!selectedValues.includes(TypeKeuring.ASBEST)) {
-      deleteCertificaat(TypeKeuring.ASBEST);
-      setValue("certificaat_asbest", "");
-    }
   }, [getValues, selectedValues, setValue, supabase]);
 
   const sortValues = (values) => {
@@ -68,7 +73,7 @@ const CheckboxTypeKeuring = ({ control, typeKeuring, setValue, getValues }) => {
           value={selectedValues}
           size="sm"
         >
-          <Stack ml={15} gap={0}>
+          <Stack gap={0}>
             {Object.values(TypeKeuring).map((value) => (
               <Checkbox
                 size="sm"

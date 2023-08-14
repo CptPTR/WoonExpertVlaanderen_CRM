@@ -8,31 +8,32 @@ const CertificaatUploader = ({ type, setValue, id }) => {
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   });
 
-  const AddEPCCertificaat = async (name) => {
+  const AddEPCCertificaat = async (name, size) => {
     const { data: certificaatData, error: certificaatError } = await supabase
       .from("Certificaat")
       .upsert({
         name: name,
         type: TypeKeuring.EPC,
         keuringID: id,
+        size: size,
       })
       .select();
 
     if (certificaatError) {
       console.error("Error toevoegen van EPC certificaat: ", certificaatError);
     } else {
-      console.log(certificaatData);
       setValue("certificaat_epc", certificaatData[0].id);
     }
   };
 
-  const AddAsbestCertificaat = async (name) => {
+  const AddAsbestCertificaat = async (name, size) => {
     const { data: certificaatData, error: certificaatError } = await supabase
       .from("Certificaat")
       .upsert({
         name: name,
         type: TypeKeuring.ASBEST,
         keuringID: id,
+        size: size,
       })
       .select();
 
@@ -42,7 +43,6 @@ const CertificaatUploader = ({ type, setValue, id }) => {
         certificaatError
       );
     } else {
-      console.log(certificaatData);
       setValue("certificaat_asbest", certificaatData[0].id);
     }
   };
@@ -55,7 +55,7 @@ const CertificaatUploader = ({ type, setValue, id }) => {
           .upload(`epc/${event.target.files[0].name}`, event.target.files[0], {
             upsert: true,
           });
-      AddEPCCertificaat(event.target.files[0].name);
+      AddEPCCertificaat(event.target.files[0].name, event.target.files[0].size);
       // setValue("certificaat_epc", uploadedEpcData.id);
       // console.log(uploadedEpcData);
     } else {
@@ -69,7 +69,10 @@ const CertificaatUploader = ({ type, setValue, id }) => {
               upsert: true,
             }
           );
-      AddAsbestCertificaat(event.target.files[0].name);
+      AddAsbestCertificaat(
+        event.target.files[0].name,
+        event.target.files[0].size
+      );
       // console.log(uploadedAsbestData);
       // setValue("certificaat_asbest", uploadedAsbestData.id);
     }

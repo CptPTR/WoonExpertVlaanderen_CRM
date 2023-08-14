@@ -12,9 +12,9 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body>
-        <StrictMode>
-          <ChakraProvider>{children}</ChakraProvider>
-        </StrictMode>
+        {/* <StrictMode> */}
+        <ChakraProvider>{children}</ChakraProvider>
+        {/* </StrictMode> */}
       </body>
     </html>
   );

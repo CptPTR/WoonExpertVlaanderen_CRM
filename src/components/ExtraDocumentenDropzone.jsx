@@ -1,9 +1,12 @@
 import styles from "@/styles/dropzone.module.css";
-import { List, ListItem, Spacer, Text } from "@chakra-ui/react";
+import { IconButton, List, ListItem, Spacer, Text } from "@chakra-ui/react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Image } from "cloudinary-react";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaRegFilePdf } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 const baseStyle = {
   flex: 1,
@@ -43,6 +46,13 @@ const ExtraDocumentenDropzone = ({
     }
     return undefined;
   };
+
+  const supabase = createClientComponentClient({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  });
+
+  const router = useRouter();
 
   const onDrop = async (acceptedFiles) => {
     for (const acceptedFile of acceptedFiles) {
@@ -106,6 +116,19 @@ const ExtraDocumentenDropzone = ({
     [isFocused]
   );
 
+  const handleDeleteExtraDocsOnClick = async (id) => {
+    const { error } = await supabase
+      .from("ExtraDocument")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting extra doc: ", id);
+    } else {
+      router.refresh();
+    }
+  };
+
   return (
     <>
       <div {...getRootProps({ style })} className={styles.dropzone}>
@@ -150,6 +173,11 @@ const ExtraDocumentenDropzone = ({
                   <Text fontSize="sm" className={styles.documentSize}>
                     {formatFileSize(document.size)}
                   </Text>
+                  <IconButton
+                    onClick={() => handleDeleteExtraDocsOnClick(document.id)}
+                    icon={<MdDelete />}
+                    mx={1}
+                  ></IconButton>
                 </div>
               </ListItem>
             ))}

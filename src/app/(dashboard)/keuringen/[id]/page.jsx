@@ -90,10 +90,12 @@ const Keuring = ({ params }) => {
       const certificaatAsbest = certificatenData.filter(
         (certificaat) => certificaat.type == TypeKeuring.ASBEST
       );
-      console.log(certificaatEPC);
-      console.log(certificaatAsbest);
-      // setCertificaatEPC(certificaatEPC[0].name);
-      // setCertificaatAsbest(certificaatAsbest[0].name);
+      if (certificaatEPC[0]) {
+        setCertificaatEPC(certificaatEPC[0]);
+      }
+      if (certificaatAsbest[0]) {
+        setCertificaatAsbest(certificaatAsbest[0]);
+      }
     };
 
     getKeuringData();
@@ -155,27 +157,43 @@ const Keuring = ({ params }) => {
     }
   };
 
-  const downloadFile = async (cldnry_id, filename) => {
-    try {
-      const response = await fetch(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${cldnry_id}`
-      );
-      if (response.ok) {
-        const blob = await response.blob();
+  const downloadFile = async (cldnry_id, folder, filename) => {
+    if (cldnry_id) {
+      try {
+        const response = await fetch(
+          `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${cldnry_id}`
+        );
+        if (response.ok) {
+          const blob = await response.blob();
 
-        const contentType = response.headers.get("Content-Type");
-        const format = contentType.split("/")[1];
+          const contentType = response.headers.get("Content-Type");
+          const format = contentType.split("/")[1];
 
-        const url = URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `${filename}.${format}`;
+          link.click();
+        } else {
+          console.error("Failed to download image.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    } else {
+      const { data, error } = await supabase.storage
+        .from("certificaten")
+        .download(`${folder}/${filename}`);
+
+      if (error) {
+        console.error("Error downloading file: ", filename);
+      } else {
+        const url = URL.createObjectURL(data);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `${filename}.${format}`;
+        link.download = `${filename}`;
         link.click();
-      } else {
-        console.error("Failed to download image.");
       }
-    } catch (error) {
-      console.error("Error:", error);
     }
   };
 
@@ -327,7 +345,7 @@ const Keuring = ({ params }) => {
                   Facturatie
                 </Heading>
                 {keuring?.facturatieID.naar !== Facturatie.ANDERS ? (
-                  <Text ml="24px">
+                  <Text ml="24px" fontSize="sm">
                     {keuring?.facturatieID.naar == Facturatie.IMMO
                       ? `${keuring?.facturatieID.naar} - ${keuring?.created_by.ondernemingID.naam}`
                       : keuring?.facturatieID.naar}
@@ -424,7 +442,9 @@ const Keuring = ({ params }) => {
                             scrop="scale"
                           />
                         ) : (
-                          <FaRegFilePdf size={32} color="#F40F02" />
+                          <Box width="48px">
+                            <FaRegFilePdf size={32} color="#F40F02" />
+                          </Box>
                         )}
                         <Text fontSize="sm" ml={5}>
                           {extraDoc.name}.{extraDoc.format}
@@ -441,7 +461,11 @@ const Keuring = ({ params }) => {
                           <Box
                             className={styles.editIcon}
                             onClick={() =>
-                              downloadFile(extraDoc.cldnry_id, extraDoc.name)
+                              downloadFile(
+                                extraDoc.cldnry_id,
+                                null,
+                                extraDoc.name
+                              )
                             }
                           >
                             <MdDownload />
@@ -489,23 +513,30 @@ const Keuring = ({ params }) => {
                     height="50px"
                   >
                     <FaRegFilePdf size={32} color="#F40F02" />
+
                     <Text fontSize="sm" ml={5}>
-                      EPC Certicaat - ...
+                      {certificaatEPC?.name || "Geen EPC certificaat geüpload"}
                     </Text>
-                    <Text fontSize="sm" ml="auto" mr={5}>
-                      {formatFileSize(10000)}
-                    </Text>
-                    <Tooltip
-                      label="Download EPC certificaat"
-                      placement="bottom-start"
-                    >
-                      <Box
-                        className={styles.editIcon}
-                        onClick={() => downloadFile()}
-                      >
-                        <MdDownload />
-                      </Box>
-                    </Tooltip>
+                    {certificaatEPC && (
+                      <>
+                        <Text fontSize="sm" ml="auto" mr={5}>
+                          {formatFileSize(certificaatEPC.size)}
+                        </Text>
+                        <Tooltip
+                          label="Download EPC certificaat"
+                          placement="bottom-start"
+                        >
+                          <Box
+                            className={styles.editIcon}
+                            onClick={() =>
+                              downloadFile(null, "epc", certificaatEPC.name)
+                            }
+                          >
+                            <MdDownload />
+                          </Box>
+                        </Tooltip>
+                      </>
+                    )}
                   </Box>
                 ) : null}
                 {keuring?.type !== TypeKeuring.EPC ? (
@@ -518,24 +549,33 @@ const Keuring = ({ params }) => {
                   >
                     <FaRegFilePdf size={32} color="#F40F02" />
                     <Text fontSize="sm" ml={5}>
-                      Asbest Certicaat - ...
+                      {certificaatAsbest?.name ||
+                        "Geen asbest certificaat geüpload"}
                     </Text>
-                    <Text>{certificaatEPC}</Text>
-
-                    <Text fontSize="sm" ml="auto" mr={5}>
-                      {formatFileSize(10000)}
-                    </Text>
-                    <Tooltip
-                      label="Download asbest certificaat"
-                      placement="bottom-start"
-                    >
-                      <Box
-                        className={styles.editIcon}
-                        onClick={() => downloadFile()}
-                      >
-                        <MdDownload />
-                      </Box>
-                    </Tooltip>
+                    {certificaatAsbest && (
+                      <>
+                        <Text fontSize="sm" ml="auto" mr={5}>
+                          {formatFileSize(certificaatAsbest.size)}
+                        </Text>
+                        <Tooltip
+                          label="Download asbest certificaat"
+                          placement="bottom-start"
+                        >
+                          <Box
+                            className={styles.editIcon}
+                            onClick={() =>
+                              downloadFile(
+                                null,
+                                "asbest",
+                                certificaatAsbest.name
+                              )
+                            }
+                          >
+                            <MdDownload />
+                          </Box>
+                        </Tooltip>
+                      </>
+                    )}
                   </Box>
                 ) : null}
               </Box>

@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  max-height: 216px;
+  max-height: 144px;
   overflow-y: scroll;
   overflow-x: hidden;
   scrollbar-color: grey #e4e4e4;
@@ -51,7 +51,6 @@
 .documentSize {
   text-align: end;
   width: fit-content;
-  margin-right: 35px;
   font-size: 12px;
 }
 
