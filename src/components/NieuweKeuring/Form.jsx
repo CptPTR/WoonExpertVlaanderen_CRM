@@ -17,7 +17,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Divider,
   Grid,
   GridItem,
   Heading,
@@ -43,7 +42,7 @@ import {
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import {
   MdAdd,
   MdAlternateEmail,
@@ -105,7 +104,7 @@ const Form = () => {
       facturatie_gemeente: "",
       datumPlaatsbezoek: null,
       status: Status.NIEUW,
-      zaakvoerder: "f3474995-7517-4640-beb9-30a522ee34c5",
+      zaakvoerder: "d454c7cd-f3d4-4df8-a1d0-2d9912b14560",
 
       certificaat_epc: null,
       certificaat_asbest: null,
@@ -116,6 +115,8 @@ const Form = () => {
       opmerking: "",
     },
   });
+
+  const watchExtraDocumenten = useWatch({ control, name: "extraDocumenten" });
 
   const onSubmit = (d) => {
     onUploadKeuringConfirmationOpen();
@@ -282,7 +283,7 @@ const Form = () => {
       </Tooltip>
       <Modal onClose={onFormClose} isOpen={isFormOpen} size="6xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent my={1}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalBody>
               <Grid
@@ -459,7 +460,7 @@ const Form = () => {
                         text="Sleep hier afbeeldingen/PDF-bestanden naartoe, of klik om ze te selecteren."
                         setValue={setValue}
                         getValues={getValues}
-                        extraDocumenten={getValues("extraDocumenten")}
+                        extraDocumenten={watchExtraDocumenten}
                       />
                     </CardBody>
                   </Card>
@@ -545,7 +546,7 @@ const Form = () => {
                 </GridItem>
               </Grid>
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter py={3}>
               <Box className={styles.validationErrors}>
                 {errors.voornaam?.type === "required" ? (
                   <Badge variant="solid" colorScheme="red">
@@ -634,7 +635,6 @@ const Form = () => {
                       </AlertDialogHeader>
                       <AlertDialogBody>
                         Ben je zeker dat u deze keuring wil opslaan?
-                        <div>{JSON.stringify(getValues(), null, 2)}</div>
                       </AlertDialogBody>
                       <AlertDialogFooter>
                         <Button

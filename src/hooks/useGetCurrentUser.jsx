@@ -21,6 +21,7 @@ const useGetCurrentUser = (supabase) => {
           telefoonnummer: user.telefoonnummer,
           onderneming: user.ondernemingID,
           rol: user.rol,
+          specfield: user.specfield,
         });
       }
     };

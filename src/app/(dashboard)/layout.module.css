@@ -1,59 +1,11 @@
-.dashboard {
-  min-height: 100vh;
-  background-color: rgb(249, 250, 251);
-  display: flex;
+.layout {
+  max-width: 1250px;
+  margin: 0 auto;
 }
 
-.sidemenu {
-  width: 275px;
-  height: 100vh;
-  position: fixed;
+.navigation {
+  height: 60px;
   display: flex;
   justify-content: space-between;
-  flex-direction: column;
-  background-color: white;
-  box-shadow: 0 12px 20px 6px rgb(104 112 118 / 0.08);
   transition: width 0.5s ease;
-}
-
-.sidemenu ul {
-  list-style-type: none;
-}
-
-.sidemenu li {
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  padding: 12px 25px;
-}
-
-.sidemenu li:hover {
-  background-color: green;
-  color: white;
-}
-
-.logo {
-  margin: 25px;
-  display: flex;
-  justify-content: center;
-}
-
-.profile {
-  display: flex;
-  padding: 25px;
-}
-
-.userInfo {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  margin-left: 25px;
-}
-
-.userInfo span {
-  font-size: 14px;
-}
-
-.userInfo span:first {
-  font-weight: bold;
 }

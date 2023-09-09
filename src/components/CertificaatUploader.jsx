@@ -1,3 +1,4 @@
+import Status from "@/models/Status";
 import TypeKeuring from "@/models/TypeKeuring";
 import { Box, Input, Text } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -23,6 +24,7 @@ const CertificaatUploader = ({ type, setValue, id }) => {
       console.error("Error toevoegen van EPC certificaat: ", certificaatError);
     } else {
       setValue("certificaat_epc", certificaatData[0].id);
+      setValue("status", Status.CERTIFICAAT);
     }
   };
 
@@ -44,6 +46,7 @@ const CertificaatUploader = ({ type, setValue, id }) => {
       );
     } else {
       setValue("certificaat_asbest", certificaatData[0].id);
+      setValue("status", Status.CERTIFICAAT);
     }
   };
 
@@ -56,8 +59,6 @@ const CertificaatUploader = ({ type, setValue, id }) => {
             upsert: true,
           });
       AddEPCCertificaat(event.target.files[0].name, event.target.files[0].size);
-      // setValue("certificaat_epc", uploadedEpcData.id);
-      // console.log(uploadedEpcData);
     } else {
       const { data: uploadedAsbestData, error: uploadedAsbestError } =
         await supabase.storage
@@ -73,8 +74,6 @@ const CertificaatUploader = ({ type, setValue, id }) => {
         event.target.files[0].name,
         event.target.files[0].size
       );
-      // console.log(uploadedAsbestData);
-      // setValue("certificaat_asbest", uploadedAsbestData.id);
     }
   };
 

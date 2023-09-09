@@ -18,11 +18,11 @@ import {
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tooltip,
   Tr,
-  Text,
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Roboto } from "next/font/google";
@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import {
+  MdAdd,
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight,
   MdRefresh,
@@ -117,21 +118,31 @@ const Keuringen = () => {
 
   return (
     <Box display="flex" flexDirection="column">
-      <header className={styles.header}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        my={5}
+      >
         <Heading size="md" className={`${roboto900.className} ${styles.title}`}>
           KEURINGEN
         </Heading>
         <Box display="flex" alignSelf="flex-end">
-          <Tooltip label="Herlaad tabel" fontSize="md" placement="top-end">
+          <Tooltip
+            label="Keuring toevoegen"
+            fontSize="md"
+            placement="top-start"
+          >
             <IconButton
               mb="10px"
               mr="10px"
-              icon={<MdRefresh />}
+              icon={<MdAdd />}
               colorScheme="green"
-              onClick={handleRefreshKeuringTabel}
+              onClick={() => {
+                router.push(`/keuringen/add`);
+              }}
             />
           </Tooltip>
-          <Form />
           <InputGroup className={styles.search} width={500}>
             <InputLeftElement pointerEvents="none">
               <FaSearch />
@@ -143,11 +154,11 @@ const Keuringen = () => {
             />
           </InputGroup>
         </Box>
-      </header>
-      <main>
+      </Box>
+      <Box>
         <div className={styles.keuringenContainer}>
           {filteredKeuringen.length > 0 ? (
-            <div>
+            <Box>
               <TableContainer
                 css={{
                   display: "flex",
@@ -159,7 +170,7 @@ const Keuringen = () => {
                 }}
               >
                 <Table variant="simple">
-                  <Thead>
+                  <Thead px={0}>
                     <Tr className={styles.tableColumn}>
                       <Th>
                         DATUM <br />
@@ -236,7 +247,7 @@ const Keuringen = () => {
                               </Text>
                             </div>
                           </Td>
-                          <Td>
+                          <Td px={0}>
                             <IconButton
                               icon={
                                 <MdKeyboardArrowRight
@@ -285,19 +296,19 @@ const Keuringen = () => {
                   </Button>
                 </ButtonGroup>
               </TableContainer>
-            </div>
+            </Box>
           ) : (
-            <div className={styles.geenKeuringen}>
+            <Box className={styles.geenKeuringen}>
               <Image
-                width={500}
+                width={400}
                 src={KeuringNietGevonden}
                 alt="Keuring niet gevonden"
               />
-              <h2>Geen keuringen gevonden</h2>
-            </div>
+              <Heading size="md">Geen keuringen gevonden</Heading>
+            </Box>
           )}
         </div>
-      </main>
+      </Box>
     </Box>
   );
 };

@@ -1,0 +1,39 @@
+.backBtn {
+  padding: 5px;
+  border-radius: 45px;
+}
+
+.backBtn:hover {
+  background-color: rgba(237, 242, 247, 1);
+  cursor: pointer;
+}
+
+.klant {
+  display: flex;
+  padding: 8px 0;
+}
+
+.cardBody label {
+  margin: 10px 0;
+}
+
+.validationErrors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 1250px;
+  overflow-wrap: break-word;
+}
+
+.validationErrors span {
+  padding: 5px 10px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.validationErrors hr {
+  background-color: tomato;
+  width: 2px;
+}

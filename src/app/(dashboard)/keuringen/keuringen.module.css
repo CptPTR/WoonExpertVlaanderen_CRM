@@ -1,5 +1,4 @@
 .header {
-  left: 275px;
 }
 
 .title {
@@ -7,8 +6,7 @@
 }
 
 .keuringenContainer {
-  width: 1200px;
-  max-width: 1200px;
+  width: 1250px;
   margin: 0 auto;
 }
 

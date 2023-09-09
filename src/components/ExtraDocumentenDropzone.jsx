@@ -63,15 +63,14 @@ const ExtraDocumentenDropzone = ({
         "upload_preset",
         process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
       );
+
       const response = await fetch(url, {
         method: "post",
         body: formData,
       });
       const data = await response.json();
 
-      console.log("UPLOADED doc:", data);
       const newDocument = {
-        // id: data.public_id,
         format: data.format,
         name: data.original_filename,
         size: data.bytes,
@@ -117,15 +116,27 @@ const ExtraDocumentenDropzone = ({
   );
 
   const handleDeleteExtraDocsOnClick = async (id) => {
-    const { error } = await supabase
-      .from("ExtraDocument")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error deleting extra doc: ", id);
+    if (id === undefined) {
+      const updatedExtraDocumenten = getValues("extraDocumenten").filter(
+        (doc) => doc.id !== id
+      );
+      setValue("extraDocumenten", updatedExtraDocumenten);
+      return;
     } else {
-      router.refresh();
+      const { error } = await supabase
+        .from("ExtraDocument")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error deleting extra doc: ", id);
+      } else {
+        const updatedExtraDocumenten = getValues("extraDocumenten").filter(
+          (doc) => doc.id !== id
+        );
+        setValue("extraDocumenten", updatedExtraDocumenten);
+        router.refresh();
+      }
     }
   };
 
@@ -148,7 +159,7 @@ const ExtraDocumentenDropzone = ({
         <div className={styles.content}>
           <List mt={10}>
             {extraDocumenten.map((document, index) => (
-              <ListItem key={document.id}>
+              <ListItem key={index}>
                 <div className={styles.imageContainer}>
                   {document.format !== "pdf" ? (
                     <Image

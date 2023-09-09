@@ -61,8 +61,12 @@ export default function Login() {
       <Image height={100} src={Logo} alt="Logo WoonExpertVlaanderen" priority />
       <form onSubmit={handleSignIn}>
         <FormControl mt="50px" fontSize="14px" fontWeight="500">
-          <FormLabel>E-mail</FormLabel>
+          <FormLabel id="label-email" htmlFor="email">
+            E-mail
+          </FormLabel>
           <Input
+            id="email"
+            name="email"
             mt="5px"
             type="email"
             value={email}
@@ -70,9 +74,13 @@ export default function Login() {
           />
         </FormControl>
         <FormControl mt="20px" fontSize="14px" fontWeight="500">
-          <FormLabel>Wachtwoord</FormLabel>
+          <FormLabel id="label-wachtwoord" htmlFor="wachtwoord">
+            Wachtwoord
+          </FormLabel>
           <InputGroup mt="5px">
             <Input
+              id="wachtwoord"
+              name="wachtwoord"
               pr="4.5rem"
               type={passwordHidden ? "password" : "text"}
               value={password}

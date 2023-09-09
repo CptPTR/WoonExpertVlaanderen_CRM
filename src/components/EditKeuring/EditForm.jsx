@@ -63,17 +63,16 @@ import {
   MdPhone,
 } from "react-icons/md";
 import CertificaatUploader from "../CertificaatUploader";
+import CertificateName from "../CertificateName";
 import CheckboxTypeKeuring from "../CheckboxTypeKeuring";
 import DatumPicker from "../DatumPicker";
-import CertificateName from "../CertificateName";
 
-const EditForm = ({ id }) => {
+const EditForm = ({ id, keuring, setKeuring }) => {
   const {
     register,
     handleSubmit,
     getValues,
     setValue,
-    watch,
     resetField,
     control,
     formState: { errors },
@@ -103,8 +102,9 @@ const EditForm = ({ id }) => {
       facturatie_gemeente: "",
 
       datumPlaatsbezoek: null,
+      plaatsbezoekEventId: null,
       status: Status.NIEUW,
-      zaakvoerder: "f3474995-7517-4640-beb9-30a522ee34c5",
+      zaakvoerder: "d454c7cd-f3d4-4df8-a1d0-2d9912b14560",
 
       certificaat_epc: "",
       certificaat_asbest: "",
@@ -116,7 +116,40 @@ const EditForm = ({ id }) => {
     },
   });
 
+  // useEffect(() => {
+  //   setValue("voornaam", keuring.klant.voornaam);
+  //   setValue("familienaam", keuring.klant.familienaam);
+  //   setValue("email", keuring.klant.emailadres);
+  //   setValue("telefoonnummer", keuring.klant.telefoonnummer);
+  //   setValue("straatnaam", keuring.adres.straatnaam);
+  //   setValue("nummer", keuring.adres.nummer);
+  //   setValue("postcode", keuring.adres.postcode);
+  //   setValue("gemeente", keuring.adres.gemeente);
+  //   setValue("facturatie_id", keuring.facturatie.id);
+  //   setValue("facturatie_naar", keuring.facturatie.naar);
+  //   setValue("facturatie_voornaam", keuring.facturatie.voornaam);
+  //   setValue("facturatie_familienaam", keuring.facturatie.familienaam);
+  //   setValue("facturatie_email", keuring.facturatie.emailadres);
+  //   setValue("facturatie_telefoonnummer", keuring.facturatie.telefoonnummer);
+  //   setValue("facturatie_straatnaam", keuring.facturatie.straatnaam);
+  //   setValue("facturatie_nummer", keuring.facturatie.nummer);
+  //   setValue("facturatie_postcode", keuring.facturatie.postcode);
+  //   setValue("facturatie_gemeente", keuring.facturatie.gemeente);
+  //   setValue("opmerking", keuring.opmerking);
+  //   setValue("type", keuring.type);
+  //   setValue("status", keuring.status);
+  //   setValue("toegang_eenheid", keuring.toegang_eenheid);
+  //   setValue("extraDocumenten", keuring.extraDocumenten);
+  //   setValue("plaatsbezoekEventId", keuring.eventId);
+  //   setValue("certificaat_epc", keuring.certificaatEPC);
+  //   setValue("certificaat_asbest", keuring.certificaatAsbest);
+  // }, []);
+
   const watchType = useWatch({ control, name: "type" });
+  const watchPlaatsbezoekEventId = useWatch({
+    control,
+    name: "plaatsbezoekEventId",
+  });
 
   const {
     isOpen: isFormOpen,
@@ -138,95 +171,106 @@ const EditForm = ({ id }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
-      let { data: keuringData, error: keuringError } = await supabase
-        .from("Keuring")
-        .select(
-          "id, datumPlaatsbezoek, epc_certificaat, asbest_certificaat, toegang_eenheid, opmerking, status, type, adresID(id, straatnaam, nummer, postcode, gemeente, klantID(id, voornaam, familienaam, emailadres, telefoonnummer)), facturatieID(id, naar, voornaam, familienaam, emailadres, telefoonnummer, straatnaam, nummer, postcode, gemeente)"
-        )
-        .eq("id", id);
+    if (id !== "") {
+      const fetchData = async () => {
+        let { data: keuringData, error: keuringError } = await supabase
+          .from("Keuring")
+          .select(
+            "id, datumPlaatsbezoek, eventID, toegang_eenheid, opmerking, status, type, adresID(id, straatnaam, nummer, postcode, gemeente, klantID(id, voornaam, familienaam, emailadres, telefoonnummer)), facturatieID(id, naar, voornaam, familienaam, emailadres, telefoonnummer, straatnaam, nummer, postcode, gemeente)"
+          )
+          .eq("id", id);
 
-      if (keuringData[0]) {
-        const {
-          adresID: {
-            klantID: {
-              id: klantId,
-              voornaam,
-              familienaam,
-              emailadres,
-              telefoonnummer,
+        if (keuringData) {
+          const {
+            id,
+            adresID: {
+              klantID: {
+                id: klantId,
+                voornaam,
+                familienaam,
+                emailadres,
+                telefoonnummer,
+              },
+              id: adresId,
+              straatnaam,
+              nummer,
+              postcode,
+              gemeente,
             },
-            id: adresId,
-            straatnaam,
-            nummer,
-            postcode,
-            gemeente,
-          },
-          toegang_eenheid,
-          type,
-          opmerking,
-          facturatieID,
-          datumPlaatsbezoek,
-        } = keuringData[0];
+            toegang_eenheid,
+            type,
+            opmerking,
+            facturatieID,
+            datumPlaatsbezoek,
+            eventID,
+          } = keuringData.at(0);
 
-        setValue("klantId", klantId);
-        setValue("voornaam", voornaam);
-        setValue("familienaam", familienaam);
-        setValue("email", emailadres);
-        setValue("telefoonnummer", telefoonnummer);
+          setValue("klantId", klantId);
+          setValue("voornaam", voornaam);
+          setValue("familienaam", familienaam);
+          setValue("email", emailadres);
+          setValue("telefoonnummer", telefoonnummer);
 
-        setValue("adresId", adresId);
-        setValue("straatnaam", straatnaam);
-        setValue("nummer", nummer);
-        setValue("postcode", postcode);
-        setValue("gemeente", gemeente);
+          setValue("adresId", adresId);
+          setValue("straatnaam", straatnaam);
+          setValue("nummer", nummer);
+          setValue("postcode", postcode);
+          setValue("gemeente", gemeente);
 
-        setValue("datumPlaatsbezoek", datumPlaatsbezoek);
-        setValue("toegang_eenheid", toegang_eenheid);
-        setValue("type", type);
-        setValue("opmerking", opmerking);
+          setValue("datumPlaatsbezoek", datumPlaatsbezoek);
+          setValue("plaatsbezoekEventId", eventID);
+          setValue("toegang_eenheid", toegang_eenheid);
+          setValue("type", type);
+          setValue("opmerking", opmerking);
 
-        setValue("facturatie_id", facturatieID.id);
-        setValue("facturatie_naar", facturatieID.naar);
-        if (facturatieID.naar == Facturatie.ANDERS) {
-          setValue("facturatie_voornaam", facturatieID.voornaam);
-          setValue("facturatie_familienaam", facturatieID.familienaam);
-          setValue("facturatie_email", facturatieID.emailadres);
-          setValue("facturatie_telefoonnummer", facturatieID.telefoonnummer);
-          setValue("facturatie_straatnaam", facturatieID.straatnaam);
-          setValue("facturatie_nummer", facturatieID.nummer);
-          setValue("facturatie_postcode", facturatieID.postcode);
-          setValue("facturatie_gemeente", facturatieID.gemeente);
+          // if (certType == TypeKeuring.EPC) {
+          //   setValue("certificaat_epc", certId);
+          // } else {
+          //   setValue("certificaat_asbest", certId);
+          // }
+
+          setValue("facturatie_id", facturatieID.id);
+          setValue("facturatie_naar", facturatieID.naar);
+          if (facturatieID.naar == Facturatie.ANDERS) {
+            setValue("facturatie_voornaam", facturatieID.voornaam);
+            setValue("facturatie_familienaam", facturatieID.familienaam);
+            setValue("facturatie_email", facturatieID.emailadres);
+            setValue("facturatie_telefoonnummer", facturatieID.telefoonnummer);
+            setValue("facturatie_straatnaam", facturatieID.straatnaam);
+            setValue("facturatie_nummer", facturatieID.nummer);
+            setValue("facturatie_postcode", facturatieID.postcode);
+            setValue("facturatie_gemeente", facturatieID.gemeente);
+          }
         }
-      }
 
-      let { data: extraDocumentenData, error: extraDocumentenError } =
-        await supabase.from("ExtraDocument").select("*").eq("keuringID", id);
+        let { data: extraDocumentenData, error: extraDocumentenError } =
+          await supabase.from("ExtraDocument").select("*").eq("keuringID", id);
 
-      setValue("extraDocumenten", extraDocumentenData);
+        setValue("extraDocumenten", extraDocumentenData);
 
-      let { data: certificatenData, error: certificatenError } = await supabase
-        .from("Certificaat")
-        .select("*")
-        .eq("keuringID", id);
+        let { data: certificatenData, error: certificatenError } =
+          await supabase.from("Certificaat").select("*").eq("keuringID", id);
 
-      const certEPC = certificatenData.filter(
-        (certificaat) => certificaat.type == TypeKeuring.EPC
-      );
+        if (certificatenData) {
+          const certEPC = certificatenData.filter(
+            (certificaat) => certificaat.type == TypeKeuring.EPC
+          );
 
-      const certAsbest = certificatenData.filter(
-        (certificaat) => certificaat.type == TypeKeuring.ASBEST
-      );
+          const certAsbest = certificatenData.filter(
+            (certificaat) => certificaat.type == TypeKeuring.ASBEST
+          );
 
-      if (certEPC[0]) {
-        setValue("certificaat_epc", certEPC[0].id);
-      }
-      if (certAsbest[0]) {
-        setValue("certificaat_asbest", certAsbest[0].id);
-      }
-    };
+          if (certEPC[0]) {
+            setValue("certificaat_epc", certEPC[0].id);
+          }
+          if (certAsbest[0]) {
+            setValue("certificaat_asbest", certAsbest[0].id);
+          }
+        }
+      };
 
-    fetchData();
+      fetchData();
+    }
   }, [id]);
 
   const facturatieNaar = useWatch({ control, name: "facturatie_naar" });
@@ -285,6 +329,10 @@ const EditForm = ({ id }) => {
       console.error("Error wijzigen van klant: ", klantError);
     } else if (klantData.length > 0) {
       klantID = klantData[0].id || null;
+      setValue("voornaam", klantData[0].voornaam);
+      setValue("familienaam", klantData[0].familienaam);
+      setValue("emailadres", klantData[0].emailadres);
+      setValue("telefoonnummer", klantData[0].telefoonnummer);
     }
 
     const { data: facturatieData, error: facturatieError } = await supabase
@@ -331,6 +379,14 @@ const EditForm = ({ id }) => {
       console.error("Error wijzigen van facturatie: ", facturatieError);
     } else if (facturatieData.length > 0) {
       facturatieID = facturatieData[0].id || null;
+      setValue("facturatie_voornaam", facturatieData[0].voornaam);
+      setValue("facturatie_familienaam", facturatieData[0].familienaam);
+      setValue("facturatie_email", facturatieData[0].emailadres);
+      setValue("facturatie_telefoonnummer", facturatieData[0].telefoonnummer);
+      setValue("facturatie_straatnaam", facturatieData[0].straatnaam);
+      setValue("facturatie_nummer", facturatieData[0].nummer);
+      setValue("facturatie_postcode", facturatieData[0].postcode);
+      setValue("facturatie_gemeente", facturatieData[0].gemeente);
     }
 
     if (klantID) {
@@ -356,6 +412,10 @@ const EditForm = ({ id }) => {
         console.error("Error wijzigen van adres: ", adresError);
       } else if (adresData.length > 0) {
         adresID = adresData[0].id || null;
+        setValue("straatnaam", adresData[0].straatnaam);
+        setValue("nummer", adresData[0].nummer);
+        setValue("gemeente", adresData[0].gemeente);
+        setValue("postcode", adresData[0].postcode);
       }
     }
 
@@ -371,6 +431,7 @@ const EditForm = ({ id }) => {
           type: getValues("type"),
           opmerking: getValues("opmerking"),
           toegang_eenheid: getValues("toegang_eenheid"),
+          eventID: getValues("plaatsbezoekEventId"),
         })
         .eq("id", id)
         .select();
@@ -379,6 +440,12 @@ const EditForm = ({ id }) => {
         console.error("Error wijzigen van keuring: ", keuringError);
       } else if (keuringData.length > 0) {
         keuringID = keuringData[0].id || null;
+        setValue("datumPlaatsbezoek", keuringData[0].datumPlaatsbezoek);
+        setValue("status", keuringData[0].status);
+        setValue("type", keuringData[0].type);
+        setValue("opmerking", keuringData[0].opmerking);
+        setValue("toegang_eenheid", keuringData[0].toegang_eenheid);
+        setValue("plaatsbezoekEventId", keuringData[0].eventID);
       }
     }
 
@@ -403,38 +470,76 @@ const EditForm = ({ id }) => {
               "Error wijzigen van extra document: ",
               extraDocumentError
             );
+          } else {
+            setValue("extraDocumenten", [...extraDocumentData]);
           }
         });
       }
     }
 
+    setKeuring((prevKeuring) => ({
+      ...prevKeuring,
+      klant: {
+        ...prevKeuring.klant,
+        voornaam: getValues("voornaam"),
+        familienaam: getValues("familienaam"),
+        email: getValues("email"),
+        telefoonnummer: getValues("telefoonnummer"),
+      },
+      adres: {
+        ...prevKeuring.adres,
+        straatnaam: getValues("straatnaam"),
+        nummer: getValues("nummer"),
+        postcode: getValues("postcode"),
+        gemeente: getValues("gemeente"),
+      },
+      toegang_eenheid: getValues("toegang_eenheid"),
+      type: getValues("type"),
+      facturatie: {
+        ...prevKeuring.facturatie,
+        id: getValues("facturatie_id"),
+        naar: getValues("facturatie_naar"),
+        voornaam: getValues("facturatie_voornaam"),
+        familienaam: getValues("facturatie_familienaam"),
+        email: getValues("facturatie_email"),
+        telefoonnummer: getValues("facturatie_telefoonnummer"),
+        straatnaam: getValues("facturatie_straatnaam"),
+        nummer: getValues("facturatie_nummer"),
+        postcode: getValues("facturatie_postcode"),
+        gemeente: getValues("facturatie_gemeente"),
+      },
+      opmerking: getValues("opmerking"),
+      extraDocumenten: getValues("extraDocumenten"),
+      datumPlaatsbezoek: getValues("datumPlaatsbezoek"),
+    }));
     onEditKeuringConfirmationClose();
     onFormClose();
   };
 
   const handleDeleteCertOnClick = async (idCert, typeRemoved) => {
-    const { error: certificaatError } = await supabase
-      .from("Certificaat")
-      .delete()
-      .eq("id", idCert);
+    if (idCert) {
+      const { error: certificaatError } = await supabase
+        .from("Certificaat")
+        .delete()
+        .eq("id", idCert);
 
-    if (certificaatError) {
-      console.error(
-        "Error (EditForm) verwijderen van certificaat: ",
-        certificaatError
-      );
-    } else {
-      switch (typeRemoved) {
-        case TypeKeuring.EPC:
-          setValue("certificaat_epc", "");
-          break;
-        case TypeKeuring.ASBEST:
-          setValue("certificaat_asbest", "");
-          break;
+      if (certificaatError) {
+        console.error(
+          "Error (EditForm) verwijderen van certificaat: ",
+          certificaatError
+        );
+      } else {
+        switch (typeRemoved) {
+          case TypeKeuring.EPC:
+            setValue("certificaat_epc", "");
+            break;
+          case TypeKeuring.ASBEST:
+            setValue("certificaat_asbest", "");
+            break;
+        }
       }
-
-      router.refresh();
     }
+    router.replace(`/keuringen/${id}`);
   };
 
   return (
@@ -445,14 +550,16 @@ const EditForm = ({ id }) => {
           icon={<MdEdit className={styles.editIcon} size={24} />}
           ml="10px"
           className={styles.keuringEdit}
-          onClick={() => onFormOpen()}
+          // onClick={() => onFormOpen()}
+          onClick={() => router.push(`/keuringen/${id}/edit`)}
         />
       </Tooltip>
       <Modal onClose={onFormClose} isOpen={isFormOpen} size="6xl">
         <ModalOverlay />
-        <ModalContent my={6}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+        <ModalContent my={1}>
+          <form onSubmit={handleSubmit}>
             <ModalBody>
+              {/* {keuring && ( */}
               <Grid templateColumns="repeat(12, 1fr)" gap={3}>
                 <GridItem
                   colSpan={4}
@@ -583,7 +690,9 @@ const EditForm = ({ id }) => {
                                   placeholder="Postcode"
                                 />
                                 <Input
-                                  {...register("gemeente", { required: true })}
+                                  {...register("gemeente", {
+                                    required: true,
+                                  })}
                                   width="70%"
                                   placeholder="Gemeente"
                                 />
@@ -635,7 +744,10 @@ const EditForm = ({ id }) => {
                         <ListItem className={styles.klant}>
                           <MdPerson
                             size={32}
-                            style={{ marginLeft: "10px", marginRight: "30px" }}
+                            style={{
+                              marginLeft: "10px",
+                              marginRight: "30px",
+                            }}
                           />
                           <InputGroup gap="15px" flexDirection="column">
                             <Input
@@ -655,7 +767,10 @@ const EditForm = ({ id }) => {
                         <ListItem className={styles.klant}>
                           <MdAlternateEmail
                             size={32}
-                            style={{ marginLeft: "10px", marginRight: "30px" }}
+                            style={{
+                              marginLeft: "10px",
+                              marginRight: "30px",
+                            }}
                           />
 
                           <Box width="100%">
@@ -670,7 +785,10 @@ const EditForm = ({ id }) => {
                         <ListItem className={styles.klant}>
                           <MdPhone
                             size={32}
-                            style={{ marginLeft: "10px", marginRight: "30px" }}
+                            style={{
+                              marginLeft: "10px",
+                              marginRight: "30px",
+                            }}
                           />
 
                           <Box width="100%">
@@ -687,7 +805,10 @@ const EditForm = ({ id }) => {
                         <ListItem className={styles.klant}>
                           <MdHome
                             size={32}
-                            style={{ marginLeft: "10px", marginRight: "30px" }}
+                            style={{
+                              marginLeft: "10px",
+                              marginRight: "30px",
+                            }}
                           />
                           <InputGroup gap={2} size="sm">
                             <Input
@@ -708,7 +829,10 @@ const EditForm = ({ id }) => {
                         <ListItem className={styles.klant}>
                           <MdLocationCity
                             size={32}
-                            style={{ marginLeft: "10px", marginRight: "30px" }}
+                            style={{
+                              marginLeft: "10px",
+                              marginRight: "30px",
+                            }}
                           />
 
                           <InputGroup gap={2} size="sm">
@@ -733,11 +857,12 @@ const EditForm = ({ id }) => {
                 </GridItem>
                 <GridItem
                   colSpan={4}
+                  rowSpan={user.rol == "zaakvoerder" ? 1 : 2}
                   bg="white"
                   boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
                 >
                   <Card padding="5px 10px 0 10px" height="100%">
-                    <Accordion allowToggle>
+                    <Accordion allowToggle defaultIndex={[1]}>
                       <AccordionItem>
                         <AccordionButton justifyContent="space-between">
                           <CardHeader padding="20px" display="flex">
@@ -754,7 +879,7 @@ const EditForm = ({ id }) => {
                               h={6}
                               w={6}
                             >
-                              {getValues("extraDocumenten").length}
+                              {getValues("extraDocumenten")?.length}
                             </Text>
                           </CardHeader>
                           <AccordionIcon />
@@ -780,31 +905,31 @@ const EditForm = ({ id }) => {
                             alignItems="center"
                           >
                             <Heading size="sm">Certificaat</Heading>
-                            {watchType !== "" && (
-                              <Text
-                                display="flex"
-                                justifyContent="center"
-                                alignItems="center"
-                                fontSize="sm"
-                                ml={3}
-                                backgroundColor="lightgreen"
-                                padding={1}
-                                borderRadius={10}
-                                h={6}
-                                w={10}
-                              >
-                                {watchCertEpc && watchCertAsbest
-                                  ? 2
-                                  : watchCertEpc || watchCertAsbest
-                                  ? 1
-                                  : 0}
-                                /
-                                {watchType.includes(TypeKeuring.EPC) &&
-                                watchType.includes(TypeKeuring.ASBEST)
-                                  ? 2
-                                  : 1}
-                              </Text>
-                            )}
+                            {/* {watchType == "" && ( */}
+                            <Text
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              fontSize="sm"
+                              ml={3}
+                              backgroundColor="lightgreen"
+                              padding={1}
+                              borderRadius={10}
+                              h={6}
+                              w={10}
+                            >
+                              {watchCertEpc && watchCertAsbest
+                                ? 2
+                                : watchCertEpc || watchCertAsbest
+                                ? 1
+                                : 0}
+                              /
+                              {watchType.includes(TypeKeuring.EPC) &&
+                              watchType.includes(TypeKeuring.ASBEST)
+                                ? 2
+                                : 1}
+                            </Text>
+                            {/* )} */}
                           </CardHeader>
                           <AccordionIcon />
                         </AccordionButton>
@@ -892,7 +1017,6 @@ const EditForm = ({ id }) => {
                                 </Box>
                               )
                             ) : null}
-                            {}
                           </CardBody>
                         </AccordionPanel>
                       </AccordionItem>
@@ -978,23 +1102,30 @@ const EditForm = ({ id }) => {
                     </CardBody>
                   </Card>
                 </GridItem>
-                <GridItem
-                  colSpan={4}
-                  bg="white"
-                  boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
-                >
-                  <Card padding="5px 10px 0 10px" height="100%">
-                    <CardHeader padding="20px">
-                      <Heading size="sm">Planning plaatsbezoek</Heading>
-                    </CardHeader>
-                    <CardBody pt={0}>
-                      <DatumPicker setValue={setValue} getValues={getValues} />
-                    </CardBody>
-                  </Card>
-                </GridItem>
+                {user.rol == "zaakvoerder" ? (
+                  <GridItem
+                    colSpan={4}
+                    bg="white"
+                    boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
+                  >
+                    <Card padding="5px 10px 0 10px" height="100%">
+                      <CardHeader padding="20px">
+                        <Heading size="sm">Planning plaatsbezoek</Heading>
+                      </CardHeader>
+                      <CardBody pt={0}>
+                        <DatumPicker
+                          setValue={setValue}
+                          getValues={getValues}
+                          watchPlaatsbezoekEventId={watchPlaatsbezoekEventId}
+                        />
+                      </CardBody>
+                    </Card>
+                  </GridItem>
+                ) : null}
               </Grid>
+              {/* )} */}
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter py={3}>
               <Box className={styles.validationErrors}>
                 {errors.voornaam?.type === "required" ? (
                   <Badge variant="solid" colorScheme="red">
@@ -1083,16 +1214,6 @@ const EditForm = ({ id }) => {
                       </AlertDialogHeader>
                       <AlertDialogBody>
                         Ben je zeker dat u deze keuring wil aanpassen?
-                        <Text>
-                          WATCH CERT EPC: {JSON.stringify(watchCertEpc)}
-                        </Text>
-                        <Text>
-                          WATCH CERT ASBEST: {JSON.stringify(watchCertAsbest)}
-                        </Text>
-                        <Text>
-                          Datum plaatsbezoek:{" "}
-                          {JSON.stringify(watchDatumPlaatsbezoek)}
-                        </Text>
                       </AlertDialogBody>
                       <AlertDialogFooter>
                         <Button
@@ -1108,7 +1229,7 @@ const EditForm = ({ id }) => {
                     </AlertDialogContent>
                   </AlertDialogOverlay>
                 </AlertDialog>
-                {/* <UploadKeuringButton handleSubmit={handleSubmit} /> */}
+
                 <Button onClick={onFormClose}>Sluiten</Button>
               </ButtonGroup>
             </ModalFooter>

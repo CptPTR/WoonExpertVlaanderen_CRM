@@ -1,7 +1,6 @@
 "use client";
 
 import styles from "@/app/(dashboard)/keuringen/[id]/keuring.module.css";
-import CertificateName from "@/components/CertificateName";
 import EditForm from "@/components/EditKeuring/EditForm";
 import { getBackgroundStatusColor } from "@/helpers/helpers";
 import Facturatie from "@/models/Facturatie";
@@ -31,7 +30,9 @@ import {
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Image } from "cloudinary-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Router from "next/router";
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaHandshake, FaRegFilePdf } from "react-icons/fa";
 import { GiHouseKeys } from "react-icons/gi";
@@ -39,6 +40,7 @@ import {
   MdAlternateEmail,
   MdDelete,
   MdDownload,
+  MdEdit,
   MdHome,
   MdLocationCity,
   MdPerson,
@@ -48,10 +50,59 @@ import {
 const Keuring = ({ params }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-  const [keuring, setKeuring] = useState(null);
-  const [extraDocumenten, setExtraDocumenten] = useState([]);
-  const [certificaatEPC, setCertificaatEPC] = useState();
-  const [certificaatAsbest, setCertificaatAsbest] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [keuring, setKeuring] = useState({
+    id: "",
+    klant: {
+      voornaam: "",
+      familienaam: "",
+      email: "",
+      telefoonnummer: "",
+    },
+    adres: {
+      straatnaam: "",
+      nummer: "",
+      postcode: "",
+      gemeente: "",
+    },
+    facturatie: {
+      id: "",
+      naar: Facturatie.IMMO,
+      voornaam: "",
+      familienaam: "",
+      email: "",
+      telefoonnummer: "",
+      straatnaam: "",
+      nummer: "",
+      postcode: "",
+      gemeente: "",
+    },
+    extraDocumenten: [],
+    certificaatEPC: {
+      id: "",
+      name: "",
+      size: 0,
+      type: TypeKeuring.EPC,
+    },
+    certificaatAsbest: {
+      id: "",
+      name: "",
+      size: 0,
+      type: TypeKeuring.ASBEST,
+    },
+    type: TypeKeuring.EPC,
+    status: Status.NIEUW,
+    toegang_eenheid: ToegangEenheid.KLANT,
+    datumPlaatsbezoek: null,
+    opmerking: "",
+    created_by: {
+      naam: "",
+    },
+  });
+
+  const klantNaam = keuring.klant.voornaam + " " + keuring.klant.familienaam;
+  const klantAdres = keuring.adres.straatnaam + " " + keuring.adres.nummer;
+  const klantWoonplaats = keuring.adres.postcode + " " + keuring.adres.gemeente;
 
   const router = useRouter();
   const supabase = createClientComponentClient({
@@ -60,58 +111,102 @@ const Keuring = ({ params }) => {
   });
 
   useEffect(() => {
+    // setIsLoading(true);
+
     const getKeuringData = async () => {
-      let { data: keuringData, error: keuringError } = await supabase
+      let { data: keuringenData, error: keuringenError } = await supabase
         .from("Keuring")
         .select(
-          "id, datumPlaatsbezoek, epc_certificaat, asbest_certificaat, toegang_eenheid, opmerking, status, type, adresID(straatnaam, nummer, postcode, gemeente, klantID(voornaam, familienaam, emailadres, telefoonnummer)), facturatieID(naar, voornaam, familienaam, emailadres, telefoonnummer, straatnaam, nummer, postcode, gemeente), created_by(ondernemingID(naam))"
+          `id, eventID, datumPlaatsbezoek, toegang_eenheid, opmerking, status, type, adresID(straatnaam, nummer, postcode, gemeente, klantID(voornaam, familienaam, emailadres, telefoonnummer)), facturatieID(naar, voornaam, familienaam, emailadres, telefoonnummer, straatnaam, nummer, postcode, gemeente), created_by(ondernemingID(naam)), ExtraDocument(id, name, size, format, cldnry_id), Certificaat(id, name, type, size)`
         )
         .eq("id", params.id);
-      setKeuring(keuringData[0]);
-    };
-    const getExtraDocumentenData = async () => {
-      let { data: extraDocumentenData, error: extraDocumentenError } =
-        await supabase
-          .from("ExtraDocument")
-          .select("*")
-          .eq("keuringID", params.id);
 
-      setExtraDocumenten(extraDocumentenData);
-    };
-    const getCertificatenData = async () => {
-      let { data: certificatenData, error: certificatenError } = await supabase
-        .from("Certificaat")
-        .select("*")
-        .eq("keuringID", params.id);
-
-      const certificaatEPC = certificatenData.filter(
-        (certificaat) => certificaat.type == TypeKeuring.EPC
-      );
-      const certificaatAsbest = certificatenData.filter(
-        (certificaat) => certificaat.type == TypeKeuring.ASBEST
-      );
-      if (certificaatEPC[0]) {
-        setCertificaatEPC(certificaatEPC[0]);
-      }
-      if (certificaatAsbest[0]) {
-        setCertificaatAsbest(certificaatAsbest[0]);
+      if (keuringenData) {
+        const certEPC = keuringenData[0].Certificaat.filter(
+          (certificaat) => certificaat.type == TypeKeuring.EPC
+        );
+        const certAsbest = keuringenData[0].Certificaat.filter(
+          (certificaat) => certificaat.type == TypeKeuring.ASBEST
+        );
+        setKeuring({
+          ...keuring,
+          id: keuringenData[0].id,
+          eventID: keuringenData[0].eventID,
+          type: keuringenData[0].type,
+          opmerking: keuringenData[0].opmerking,
+          toegang_eenheid: keuringenData[0].toegang_eenheid,
+          status: keuringenData[0].status,
+          datumPlaatsbezoek: keuringenData[0].datumPlaatsbezoek,
+          klant: {
+            ...keuring.klant,
+            voornaam: keuringenData[0].adresID.klantID.voornaam,
+            familienaam: keuringenData[0].adresID.klantID.familienaam,
+            email: keuringenData[0].adresID.klantID.emailadres,
+            telefoonnummer: keuringenData[0].adresID.klantID.telefoonnummer,
+          },
+          adres: {
+            ...keuring.adres,
+            straatnaam: keuringenData[0].adresID.straatnaam,
+            nummer: keuringenData[0].adresID.nummer,
+            postcode: keuringenData[0].adresID.postcode,
+            gemeente: keuringenData[0].adresID.gemeente,
+          },
+          facturatie: {
+            ...keuring.facturatie,
+            naar: keuringenData[0].facturatieID.naar,
+            voornaam: keuringenData[0].facturatieID.voornaam,
+            familienaam: keuringenData[0].facturatieID.familienaam,
+            emailadres: keuringenData[0].facturatieID.emailadres,
+            telefoonnummer: keuringenData[0].facturatieID.telefoonnummer,
+            straatnaam: keuringenData[0].facturatieID.straatnaam,
+            nummer: keuringenData[0].facturatieID.nummer,
+            postcode: keuringenData[0].facturatieID.postcode,
+            gemeente: keuringenData[0].facturatieID.gemeente,
+          },
+          created_by: {
+            ...keuring.created_by,
+            naam: keuringenData[0].created_by.ondernemingID.naam,
+          },
+          extraDocumenten: keuringenData[0].ExtraDocument,
+          certificaatEPC: {
+            ...keuring.certificaatEPC,
+            id: certEPC[0]?.id || "",
+            name: certEPC[0]?.name || "",
+            size: certEPC[0]?.size || 0,
+          },
+          certificaatAsbest: {
+            ...keuring.certificaatAsbest,
+            id: certAsbest[0]?.id || "",
+            name: certAsbest[0]?.name || "",
+            size: certAsbest[0]?.size || 0,
+          },
+        });
+      } else {
+        console.error("Error fetching keuring: ", keuringenError);
       }
     };
 
     getKeuringData();
-    getExtraDocumentenData();
-    getCertificatenData();
   }, [params.id, supabase]);
 
   const handleDeleteKeuring = async () => {
-    const { error } = await supabase
-      .from("Keuring")
+    const { error: certError } = await supabase
+      .from("Certificaat")
       .delete()
-      .eq("id", params.id);
-    if (error) {
-      console.log("Could not delete keuring: ", error);
+      .eq("keuringID", params.id);
+
+    if (certError) {
+      console.error("Could not delete certificate of keuring id: ", params.id);
     } else {
-      router.replace("/keuringen");
+      const { error: keuringError } = await supabase
+        .from("Keuring")
+        .delete()
+        .eq("id", params.id);
+      if (keuringError) {
+        console.error("Could not delete keuring: ", error);
+      } else {
+        router.replace("/keuringen");
+      }
     }
   };
 
@@ -143,25 +238,40 @@ const Keuring = ({ params }) => {
     }
   };
 
-  const removeFiles = (from) => {
-    if (from == "extradocs") {
-      setKeuring((previousKeuring) => ({
-        ...previousKeuring,
-        extraDocumenten: [],
-      }));
+  const downloadExtraDocument = async (extraDoc) => {
+    const cloudinaryCloudname = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const response = await fetch(
+      `https://res.cloudinary.com/${cloudinaryCloudname}/image/upload/${extraDoc.cldnry_id}`
+    );
+    if (response.ok) {
+      const blob = await response.blob();
+      const format = extraDoc.format;
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      const defaultFilename = "downloaded_file";
+      const suggestedFilename = extraDoc.name || defaultFilename;
+
+      link.download = `${suggestedFilename}.${format}`;
+      link.click();
     } else {
-      setKeuring((previousKeuring) => ({
-        ...previousKeuring,
-        certificaat: {},
-      }));
+      console.error("ERROR");
     }
   };
 
   const downloadFile = async (cldnry_id, folder, filename) => {
     if (cldnry_id) {
       try {
+        console.log(filename);
         const response = await fetch(
-          `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${cldnry_id}`
+          `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${cldnry_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY}`,
+            },
+          }
         );
         if (response.ok) {
           const blob = await response.blob();
@@ -172,13 +282,17 @@ const Keuring = ({ params }) => {
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `${filename}.${format}`;
+
+          const defaultFilename = "downloaded_file";
+          const suggestedFilename = filename || defaultFilename;
+
+          link.download = `${suggestedFilename}.${format}`;
           link.click();
         } else {
-          console.error("Failed to download image.");
+          console.error("Failed to download image: ", response.statusText);
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error:", error.message);
       }
     } else {
       const { data, error } = await supabase.storage
@@ -199,119 +313,125 @@ const Keuring = ({ params }) => {
 
   return (
     <Box display="flex" flexDirection="column">
-      {keuring && (
-        <header className={styles.header}>
-          <Box display="flex" alignItems="center">
-            <FaArrowLeft
-              size={28}
-              onClick={() => router.back()}
-              className={styles.backBtn}
-            />
-            <Heading size="md" ml={3}>
-              KEURING
-            </Heading>
-          </Box>
-          <Box display="flex">
-            <Tooltip label={keuring.toegang_eenheid} placement="bottom-end">
-              <Tag variant="solid" bgColor="black" color="white">
-                <TagLabel>
-                  {keuring.toegang_eenheid == ToegangEenheid.KLANT ? (
-                    <FaHandshake size={24} />
-                  ) : (
-                    <GiHouseKeys size={24} />
-                  )}
-                </TagLabel>
-              </Tag>
-            </Tooltip>
-            <Tag variant="solid" bgColor="blackAlpha.700" color="white" ml={2}>
-              <TagLabel>{keuring.type}</TagLabel>
-            </Tag>
-            <Tag
-              variant="solid"
-              bgColor={getBackgroundStatusColor(keuring)}
-              color="white"
-              ml={2}
-            >
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        my={5}
+      >
+        <Box display="flex" alignItems="center" p={3}>
+          <FaArrowLeft
+            size={28}
+            onClick={() => router.back()}
+            className={styles.backBtn}
+          />
+          <Heading size="md" ml={3}>
+            Keuring
+          </Heading>
+        </Box>
+        <Box display="flex">
+          <Tooltip label={keuring.toegang_eenheid} placement="bottom-end">
+            <Tag variant="solid" bgColor="black" color="white">
               <TagLabel>
-                {keuring.status +
-                  (keuring.status == Status.INGEPLAND
-                    ? " -> " + formatDate(keuring.datumPlaatsbezoek)
-                    : "")}
+                {keuring.toegang_eenheid == ToegangEenheid.KLANT ? (
+                  <FaHandshake size={24} />
+                ) : (
+                  <GiHouseKeys size={24} />
+                )}
               </TagLabel>
             </Tag>
-            <EditForm id={keuring.id} />
-            <Tooltip label="Verwijder keuring" placement="bottom-end">
-              <IconButton
-                size="lg"
-                icon={<MdDelete />}
-                ml={2}
-                onClick={onOpen}
-              />
-            </Tooltip>
+          </Tooltip>
+          <Tag variant="solid" bgColor="blackAlpha.700" color="white" ml={2}>
+            <TagLabel>{keuring.type}</TagLabel>
+          </Tag>
+          <Tag
+            variant="solid"
+            bgColor={getBackgroundStatusColor(keuring)}
+            color="white"
+            ml={2}
+          >
+            <TagLabel>
+              {keuring.status +
+                (keuring.status == Status.INGEPLAND
+                  ? " -> " + formatDate(keuring.datumPlaatsbezoek)
+                  : "")}
+            </TagLabel>
+          </Tag>
+          <Tooltip label="Pas keuring aan" placement="bottom-end">
+            <IconButton
+              size="lg"
+              icon={<MdEdit size={22} />}
+              ml="10px"
+              onClick={() => router.push(`/keuringen/${keuring.id}/edit`)}
+            />
+          </Tooltip>
+          <Tooltip label="Verwijder keuring" placement="bottom-end">
+            <IconButton
+              size="lg"
+              icon={<MdDelete size={22} />}
+              ml={2}
+              onClick={onOpen}
+            />
+          </Tooltip>
 
-            <AlertDialog
-              isOpen={isOpen}
-              leastDestructiveRef={cancelRef}
-              onClose={onClose}
-            >
-              <AlertDialogOverlay>
-                <AlertDialogContent>
-                  <AlertDialogHeader fontWeight="bold">
-                    Keuring verwijderen
-                  </AlertDialogHeader>
-                  <AlertDialogBody>
-                    Ben u zeker dat u deze keuring wil verwijderen?
-                  </AlertDialogBody>
-                  <AlertDialogFooter>
-                    <Button ref={cancelRef} onClick={onClose}>
-                      Sluit venster
-                    </Button>
-                    <Button
-                      bgColor="red"
-                      color="white"
-                      ml={2}
-                      onClick={handleDeleteKeuring}
-                    >
-                      Verwijder Keuring
-                    </Button>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialogOverlay>
-            </AlertDialog>
-          </Box>
-        </header>
-      )}
-      <main className={styles.main}>
+          <AlertDialog
+            isOpen={isOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontWeight="bold">
+                  Keuring verwijderen
+                </AlertDialogHeader>
+                <AlertDialogBody>
+                  Ben u zeker dat u deze keuring wil verwijderen?
+                </AlertDialogBody>
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={onClose}>
+                    Sluit venster
+                  </Button>
+                  <Button
+                    bgColor="red"
+                    color="white"
+                    ml={2}
+                    onClick={handleDeleteKeuring}
+                  >
+                    Verwijder Keuring
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
+        </Box>
+      </Box>
+
+      <Box>
         <div className={styles.keuringContainer}>
           <Box display="flex" gap="20px">
             <Box className={styles.cardBox} width="fit-content">
               <Box className={styles.box}>
                 <Heading size="sm">Klant</Heading>
                 <List mt={5}>
-                  {keuring && (
-                    <>
-                      <ListItem className={styles.klant} fontSize="sm">
-                        <MdPerson size={24} style={{ margin: "0 20px" }} />
-                        {/* <Text fontSize="sm"> */}
-                        {keuring.adresID?.klantID?.voornaam +
-                          " " +
-                          keuring.adresID?.klantID?.familienaam}
-                        {/* </Text> */}
-                      </ListItem>
-                      <ListItem className={styles.klant} fontSize="sm">
-                        <MdAlternateEmail
-                          size={24}
-                          style={{ margin: "0 20px" }}
-                        />
-
-                        {keuring.adresID?.klantID?.emailadres}
-                      </ListItem>
-                      <ListItem className={styles.klant} fontSize="sm">
-                        <MdPhone size={24} style={{ margin: "0 20px" }} />
-                        {keuring.adresID?.klantID?.telefoonnummer}
-                      </ListItem>
-                    </>
-                  )}
+                  <>
+                    <ListItem className={styles.klant} fontSize="sm">
+                      <MdPerson size={24} style={{ margin: "0 20px" }} />
+                      {klantNaam}
+                    </ListItem>
+                    <ListItem className={styles.klant} fontSize="sm">
+                      <MdAlternateEmail
+                        size={24}
+                        style={{ margin: "0 20px" }}
+                      />
+                      {/* <Skeleton isLoaded={isLoading}> */}
+                      {keuring.klant.email}
+                      {/* </Skeleton> */}
+                    </ListItem>
+                    <ListItem className={styles.klant} fontSize="sm">
+                      <MdPhone size={24} style={{ margin: "0 20px" }} />
+                      {keuring.klant.telefoonnummer}
+                    </ListItem>
+                  </>
                 </List>
               </Box>
               <Divider />
@@ -322,18 +442,14 @@ const Keuring = ({ params }) => {
                     <>
                       <ListItem className={styles.adres} fontSize="sm">
                         <MdHome size={24} style={{ margin: "0 20px" }} />
-                        {keuring.adresID?.straatnaam +
-                          " " +
-                          keuring.adresID?.nummer}
+                        {klantAdres}
                       </ListItem>
                       <ListItem className={styles.adres} fontSize="sm">
                         <MdLocationCity
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        {keuring.adresID?.postcode +
-                          " " +
-                          keuring.adresID?.gemeente}
+                        {klantWoonplaats}
                       </ListItem>
                     </>
                   )}
@@ -344,45 +460,44 @@ const Keuring = ({ params }) => {
                 <Heading size="sm" mb={5}>
                   Facturatie
                 </Heading>
-                {keuring?.facturatieID.naar !== Facturatie.ANDERS ? (
+                {keuring.facturatie.naar !== Facturatie.ANDERS ? (
                   <Text ml="24px" fontSize="sm">
-                    {keuring?.facturatieID.naar == Facturatie.IMMO
-                      ? `${keuring?.facturatieID.naar} - ${keuring?.created_by.ondernemingID.naam}`
-                      : keuring?.facturatieID.naar}
+                    {keuring.facturatie.naar == Facturatie.IMMO
+                      ? `${keuring.facturatie.naar} - ${keuring.created_by.naam}`
+                      : keuring.facturatie.naar}
                   </Text>
                 ) : null}
 
-                {keuring?.facturatieID.naar == Facturatie.ANDERS ? (
+                {keuring.facturatie.naar == Facturatie.ANDERS ? (
                   <>
                     <List>
                       <ListItem className={styles.klant} fontSize="sm">
                         <MdPerson size={24} style={{ margin: "0 20px" }} />
-                        {keuring.facturatieID.voornaam}{" "}
-                        {keuring.facturatieID.familienaam}
+                        {keuring.facturatie.voornaam}{" "}
+                        {keuring.facturatie.familienaam}
                       </ListItem>
                       <ListItem className={styles.klant} fontSize="sm">
                         <MdAlternateEmail
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        {keuring.facturatieID.emailadres}
+                        {keuring.facturatie.emailadres}
                       </ListItem>
                       <ListItem className={styles.klant} fontSize="sm">
                         <MdPhone size={24} style={{ margin: "0 20px" }} />
-                        {keuring.facturatieID.telefoonnummer}
+                        {keuring.facturatie.telefoonnummer}
                       </ListItem>
                       <ListItem className={styles.klant} fontSize="sm">
                         <MdHome size={24} style={{ margin: "0 20px" }} />
-                        <Text>{`${keuring.facturatieID.straatnaam} ${keuring.facturatieID.nummer}`}</Text>
+                        {`${keuring.facturatie.straatnaam} ${keuring.facturatie.nummer}`}
                       </ListItem>
                       <ListItem className={styles.klant} fontSize="sm">
                         <MdLocationCity
                           size={24}
                           style={{ margin: "0 20px" }}
                         />
-                        <Text>
-                          {`${keuring.facturatieID.postcode} ${keuring.facturatieID.gemeente}`}
-                        </Text>
+
+                        {`${keuring.facturatie.postcode} ${keuring.facturatie.gemeente}`}
                       </ListItem>
                     </List>
                   </>
@@ -391,41 +506,30 @@ const Keuring = ({ params }) => {
             </Box>
             <Box className={styles.cardBox} width="100%" position="relative">
               <Box className={styles.box}>
-                {extraDocumenten?.length > 0 ? (
-                  <Box className={styles.editIconContainer}>
-                    <Tooltip
-                      label="Download alle documenten"
-                      placement="bottom-end"
-                    >
-                      <Box className={styles.editIcon}>
-                        <MdDownload size={21} />
-                      </Box>
-                    </Tooltip>
-                    <Tooltip
-                      label="Verwijder alle documenten"
-                      placement="bottom-end"
-                    >
-                      <Box
-                        className={styles.editIcon}
-                        onClick={() => removeFiles("extradocs")}
-                      >
-                        <MdDelete size={21} />
-                      </Box>
-                    </Tooltip>
-                  </Box>
-                ) : null}
                 <Heading size="sm">Extra documenten</Heading>
-                {extraDocumenten?.length > 0 ? (
+                {keuring.extraDocumenten.length == 0 ? (
+                  <Box
+                    mt="20px"
+                    height="210px"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Text>Geen extra documenten</Text>
+                  </Box>
+                ) : (
                   <List
                     mt="20px"
                     maxHeight="210px"
-                    overflowY={extraDocumenten.length > 3 ? "scroll" : "auto"}
+                    overflowY={
+                      keuring.extraDocumenten.length > 3 ? "scroll" : "auto"
+                    }
                   >
-                    {extraDocumenten?.map((extraDoc) => (
+                    {keuring.extraDocumenten.map((extraDoc, index) => (
                       <ListItem
+                        key={extraDoc.id}
                         mt={5}
                         pl={5}
-                        key={extraDoc.id}
                         display="flex"
                         alignItems="center"
                         height="50px"
@@ -460,13 +564,7 @@ const Keuring = ({ params }) => {
                         >
                           <Box
                             className={styles.editIcon}
-                            onClick={() =>
-                              downloadFile(
-                                extraDoc.cldnry_id,
-                                null,
-                                extraDoc.name
-                              )
-                            }
+                            onClick={() => downloadExtraDocument(extraDoc)}
                           >
                             <MdDownload />
                           </Box>
@@ -474,37 +572,12 @@ const Keuring = ({ params }) => {
                       </ListItem>
                     ))}
                   </List>
-                ) : (
-                  <Box
-                    mt="20px"
-                    height="210px"
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    <Text>Geen extra documenten</Text>
-                  </Box>
                 )}
               </Box>
               <Divider />
               <Box className={styles.box}>
-                <div className={styles.editIconContainer}>
-                  <Tooltip label="Download certificaat" placement="bottom-end">
-                    <Box className={styles.editIcon}>
-                      <MdDownload size={21} />
-                    </Box>
-                  </Tooltip>
-                  <Tooltip label="Verwijder certificaat" placement="bottom-end">
-                    <Box
-                      className={styles.editIcon}
-                      onClick={() => removeFiles("certificaat")}
-                    >
-                      <MdDelete size={21} />
-                    </Box>
-                  </Tooltip>
-                </div>
                 <Heading size="sm">Certificaat</Heading>
-                {keuring?.type !== TypeKeuring.ASBEST ? (
+                {keuring.type !== TypeKeuring.ASBEST ? (
                   <Box
                     display="flex"
                     alignItems="center"
@@ -515,12 +588,14 @@ const Keuring = ({ params }) => {
                     <FaRegFilePdf size={32} color="#F40F02" />
 
                     <Text fontSize="sm" ml={5}>
-                      {certificaatEPC?.name || "Geen EPC certificaat geüpload"}
+                      {keuring.certificaatEPC.name ||
+                        "Geen EPC certificaat geüpload"}
                     </Text>
-                    {certificaatEPC && (
+
+                    {keuring.certificaatEPC.size ? (
                       <>
                         <Text fontSize="sm" ml="auto" mr={5}>
-                          {formatFileSize(certificaatEPC.size)}
+                          {formatFileSize(keuring.certificaatEPC.size)}
                         </Text>
                         <Tooltip
                           label="Download EPC certificaat"
@@ -529,17 +604,21 @@ const Keuring = ({ params }) => {
                           <Box
                             className={styles.editIcon}
                             onClick={() =>
-                              downloadFile(null, "epc", certificaatEPC.name)
+                              downloadFile(
+                                null,
+                                "epc",
+                                keuring.certificaatEPC.name
+                              )
                             }
                           >
                             <MdDownload />
                           </Box>
                         </Tooltip>
                       </>
-                    )}
+                    ) : null}
                   </Box>
                 ) : null}
-                {keuring?.type !== TypeKeuring.EPC ? (
+                {keuring.type !== TypeKeuring.EPC ? (
                   <Box
                     display="flex"
                     alignItems="center"
@@ -549,13 +628,13 @@ const Keuring = ({ params }) => {
                   >
                     <FaRegFilePdf size={32} color="#F40F02" />
                     <Text fontSize="sm" ml={5}>
-                      {certificaatAsbest?.name ||
+                      {keuring.certificaatAsbest.name ||
                         "Geen asbest certificaat geüpload"}
                     </Text>
-                    {certificaatAsbest && (
+                    {keuring.certificaatAsbest.size ? (
                       <>
                         <Text fontSize="sm" ml="auto" mr={5}>
-                          {formatFileSize(certificaatAsbest.size)}
+                          {formatFileSize(keuring.certificaatAsbest.size)}
                         </Text>
                         <Tooltip
                           label="Download asbest certificaat"
@@ -567,7 +646,7 @@ const Keuring = ({ params }) => {
                               downloadFile(
                                 null,
                                 "asbest",
-                                certificaatAsbest.name
+                                keuring.certificaatAsbest.name
                               )
                             }
                           >
@@ -575,14 +654,13 @@ const Keuring = ({ params }) => {
                           </Box>
                         </Tooltip>
                       </>
-                    )}
+                    ) : null}
                   </Box>
                 ) : null}
               </Box>
               <Divider />
               <Box className={styles.box}>
                 <Heading size="sm">Extra opmerkingen</Heading>
-                {/* 140px */}
                 <Text
                   fontSize="sm"
                   minHeight={100}
@@ -596,7 +674,8 @@ const Keuring = ({ params }) => {
             </Box>
           </Box>
         </div>
-      </main>
+      </Box>
+      {/* </main> */}
     </Box>
   );
 };

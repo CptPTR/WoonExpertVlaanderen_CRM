@@ -34,7 +34,7 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
     const fieldsToReset = [
       "voornaam",
       "familienaam",
-      "email",
+      "emailadres",
       "telefoonnummer",
       "straatnaam",
       "nummer",
@@ -63,7 +63,7 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
 
   return (
     <GridItem
-      rowSpan={5}
+      // rowSpan={5}
       colSpan={4}
       bg="white"
       boxShadow={"0 12px 20px 6px rgb(104 112 118 / 0.08)"}
@@ -82,12 +82,14 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
           >
             <Stack direction="row">
               <Radio
+                id="facturatie_hetzelfde"
                 value={Facturatie.HETZELFDE.valueOf()}
                 onChange={handleRadioChange}
               >
                 {Facturatie.HETZELFDE}
               </Radio>
               <Radio
+                id="facturatie_immo"
                 value={Facturatie.IMMO.valueOf()}
                 onChange={handleRadioChange}
                 ml={5}
@@ -95,6 +97,7 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
                 {Facturatie.IMMO}
               </Radio>
               <Radio
+                id="facturatie_anders"
                 value={Facturatie.ANDERS.valueOf()}
                 onChange={handleRadioChange}
                 ml={5}
@@ -147,13 +150,13 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
 
               <Box width="100%">
                 <Input
-                  {...register("facturatie_email")}
+                  {...register("facturatie_emailadres")}
                   disabled={
                     currentFacturatieNaar !== Facturatie.ANDERS ? true : false
                   }
                   defaultValue={
                     currentFacturatieNaar === Facturatie.ANDERS
-                      ? formValues("email")
+                      ? formValues("emailadres")
                       : ""
                   }
                   placeholder="E-mail"
