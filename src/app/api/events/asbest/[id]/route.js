@@ -1,4 +1,3 @@
-import creds from "@/credentials.json";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 
@@ -7,8 +6,8 @@ export async function DELETE(request, { params }) {
     const id = params.id;
 
     const auth = new google.auth.JWT({
-      email: creds.client_email,
-      key: creds.private_key,
+      email: process.env.NEXT_PUBLIC_CRED_CLIENT_EMAIL,
+      key: process.env.NEXT_PUBLIC_CRED_PRIVATE_KEY,
       scopes: [
         "https://www.googleapis.com/auth/calendar",
         "https://www.googleapis.com/auth/calendar.events",
