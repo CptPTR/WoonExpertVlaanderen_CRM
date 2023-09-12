@@ -26,11 +26,11 @@ export async function GET(request, { params }) {
       singleEvents: true,
     });
 
-    if (res.data) {
-      const data = await res.data.items.map((event) => event.start.dateTime);
+    if (res.data && res.data.items) {
+      const data = res.data.items.map((event) => event.start.dateTime);
       return NextResponse.json({ data });
     } else {
-      return;
+      return NextResponse.json({ data: [] });
     }
   } catch (error) {
     console.error("Error: ", error);
