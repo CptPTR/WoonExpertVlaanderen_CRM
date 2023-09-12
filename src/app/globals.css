@@ -17,6 +17,10 @@ a {
   text-decoration: none;
 }
 
+.react-datepicker__time-list-item--disabled {
+  display: none;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

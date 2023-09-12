@@ -1,6 +1,6 @@
 import Status from "@/models/Status";
 import styles from "@/styles/datepicker.module.css";
-import { Box, Button, Spacer, Spinner, Text } from "@chakra-ui/react";
+import { Box, Button, Spinner, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,12 +11,8 @@ const DatumPicker = ({
   getValues,
   control,
   defaultValue,
-  // datumPlaatsbezoek,
   plaatsbezoekEventId,
   plaatsbezoekEventIdAsbest,
-  // watchDatumPlaatsbezoek,
-  // watchPlaatsbezoekEventId,
-  // watchPlaatsbezoekEventIdAsbest,
 }) => {
   const [startDate, setStartDate] = useState();
   const [unavailableTimes, setUnAvailableTimes] = useState([]);
@@ -80,7 +76,6 @@ const DatumPicker = ({
 
     try {
       if (plaatsbezoekEventId) {
-        console.log("Delete event ID: ", plaatsbezoekEventId);
         deleteEvent(
           plaatsbezoekEventId,
           process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST
@@ -88,7 +83,6 @@ const DatumPicker = ({
       }
 
       if (plaatsbezoekEventIdAsbest) {
-        console.log("Delete Asbest Event ID: ", plaatsbezoekEventIdAsbest);
         deleteEvent(
           plaatsbezoekEventIdAsbest,
           process.env.NEXT_PUBLIC_GMAIL_ASBEST
@@ -213,10 +207,13 @@ const DatumPicker = ({
               filterDate={isWeekday}
               timeIntervals={15}
               calendarStartDay={1}
+              minTime={new Date().setHours(7, 0, 0, 0)}
+              maxTime={new Date().setHours(19, 0, 0, 0)}
               isClearable
               dateFormat="dd/MM/yyyy h:mm aa"
               showTimeSelect
               onChange={(date) => {
+                date.setHours(7, 0, 0, 0);
                 setStartDate(date);
                 setValue("datumPlaatsbezoek", date);
                 setIsEventDateChosen(true);
