@@ -1,5 +1,13 @@
 import styles from "@/styles/dropzone.module.css";
-import { IconButton, List, ListItem, Spacer, Text } from "@chakra-ui/react";
+import {
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  Spacer,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Image } from "cloudinary-react";
 import { useRouter } from "next/navigation";
@@ -176,14 +184,19 @@ const ExtraDocumentenDropzone = ({
                 </div>
 
                 <div className={styles.documentInfo}>
-                  <Text fontSize="sm" className={styles.documentName}>
-                    {document.name}
-                  </Text>
+                  <Box display="flex" flexDirection="column">
+                    <Tooltip label={document.name} placement="top-start">
+                      <Text fontSize="sm" className={styles.documentName}>
+                        {document.name}
+                      </Text>
+                    </Tooltip>
 
+                    {/* <Spacer /> */}
+                    <Text fontSize="x-small" className={styles.documentSize}>
+                      {formatFileSize(document.size)}
+                    </Text>
+                  </Box>
                   <Spacer />
-                  <Text fontSize="sm" className={styles.documentSize}>
-                    {formatFileSize(document.size)}
-                  </Text>
                   <IconButton
                     onClick={() => handleDeleteExtraDocsOnClick(document.id)}
                     icon={<MdDelete />}

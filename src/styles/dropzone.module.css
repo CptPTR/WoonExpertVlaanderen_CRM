@@ -27,7 +27,7 @@
 }
 
 .imageContainer {
-  width: 100px;
+  width: 75px;
   height: 40px;
   display: flex;
   justify-content: center;
@@ -38,9 +38,11 @@
   display: flex;
   width: 100%;
   align-items: center;
+  margin-left: 10px;
 }
 
 .documentName {
+  width: 175px;
   height: 24px;
   font-weight: bold;
   white-space: nowrap;
