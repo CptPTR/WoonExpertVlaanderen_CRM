@@ -176,7 +176,7 @@ const Keuringen = () => {
                         DATUM <br />
                         TOEWIJZING
                       </Th>
-                      <Th>IMMO</Th>
+                      <Th>AANGEMAAKT DOOR</Th>
                       <Th>KLANT</Th>
                       <Th>ADRES</Th>
                       <Th>TYPE</Th>
