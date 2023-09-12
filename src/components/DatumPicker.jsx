@@ -213,7 +213,6 @@ const DatumPicker = ({
               dateFormat="dd/MM/yyyy h:mm aa"
               showTimeSelect
               onChange={(date) => {
-                date.setHours(7, 0, 0, 0);
                 setStartDate(date);
                 setValue("datumPlaatsbezoek", date);
                 setIsEventDateChosen(true);
