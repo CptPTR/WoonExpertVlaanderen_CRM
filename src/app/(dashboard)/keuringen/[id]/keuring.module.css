@@ -23,7 +23,7 @@
 }
 
 .opmerking {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .backBtn {

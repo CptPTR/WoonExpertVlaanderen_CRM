@@ -546,8 +546,12 @@ const Keuring = ({ params }) => {
                             scrop="scale"
                           />
                         ) : (
-                          <Box width="48px">
-                            <FaRegFilePdf size={32} color="#F40F02" />
+                          <Box
+                            width="48px"
+                            display="flex"
+                            justifyContent="center"
+                          >
+                            <FaRegFilePdf size={38} color="#F40F02" />
                           </Box>
                         )}
                         <Text fontSize="sm" ml={5}>
@@ -564,6 +568,7 @@ const Keuring = ({ params }) => {
                         >
                           <Box
                             className={styles.editIcon}
+                            mr={5}
                             onClick={() => downloadExtraDocument(extraDoc)}
                           >
                             <MdDownload />
@@ -585,7 +590,7 @@ const Keuring = ({ params }) => {
                     pl={5}
                     height="50px"
                   >
-                    <FaRegFilePdf size={32} color="#F40F02" />
+                    <FaRegFilePdf size={38} color="#F40F02" />
 
                     <Text fontSize="sm" ml={5}>
                       {keuring.certificaatEPC.name ||
@@ -626,7 +631,7 @@ const Keuring = ({ params }) => {
                     pl={5}
                     height="50px"
                   >
-                    <FaRegFilePdf size={32} color="#F40F02" />
+                    <FaRegFilePdf size={38} color="#F40F02" />
                     <Text fontSize="sm" ml={5}>
                       {keuring.certificaatAsbest.name ||
                         "Geen asbest certificaat geüpload"}
