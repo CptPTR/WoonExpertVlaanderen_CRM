@@ -616,7 +616,7 @@ const EditKeuring = () => {
               <CardBody>
                 <Box>
                   <Heading size="sm" mb={5}>
-                    Klant
+                    Keuring
                   </Heading>
                   <List>
                     <ListItem className={styles.klant}>
@@ -679,7 +679,7 @@ const EditKeuring = () => {
                             {...register("telefoonnummer", {
                               required: true,
                               pattern:
-                                /^(?:(?:\+?\d{1,3})?[-. ]?)?\(?\d{1,}\)?[-. ]?\d+[-. ]?\d+$/,
+                                /^(?:(?:\+|00)32\s?|)(?:(?:4[789]\d|9\d)(?:\s?\d{2}){3}|(?:(?:\+|00)32\s?|)(?:\d\s?\d{3}|\d{2}\s?\d{2})(?:\s?\d{2}){2})$/,
                             })}
                             placeholder="Telefoonnummer"
                             type="tel"
