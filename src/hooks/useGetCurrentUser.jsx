@@ -10,7 +10,9 @@ const useGetCurrentUser = (supabase) => {
       if (session) {
         const { data: user } = await supabase
           .from("users")
-          .select("*")
+          .select(
+            "id, email, voornaam, familienaam, telefoonnummer, email, Onderneming(naam), rol, specfield"
+          )
           .eq("id", session.user.id)
           .single();
         setUser({
@@ -19,7 +21,7 @@ const useGetCurrentUser = (supabase) => {
           familienaam: user.familienaam,
           email: user.email,
           telefoonnummer: user.telefoonnummer,
-          onderneming: user.ondernemingID,
+          onderneming: user.Onderneming.naam,
           rol: user.rol,
           specfield: user.specfield,
         });

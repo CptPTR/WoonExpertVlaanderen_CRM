@@ -51,6 +51,7 @@ import {
 import styles from "./keuringAdd.module.css";
 import DatumPicker from "@/components/DatumPicker";
 import { useRouter } from "next/navigation";
+import { sendNotifMail } from "@/app/services/sendMail";
 
 const AddKeuring = () => {
   const cancelRef = useRef();
@@ -271,6 +272,11 @@ const AddKeuring = () => {
     }
 
     onUploadKeuringConfirmationClose();
+    sendNotifMail(
+      user.onderneming,
+      getValues("type"),
+      `https://my.woonexpertvlaanderen.be/keuringen/${keuringID}`
+    );
     router.replace("/keuringen");
   };
 
