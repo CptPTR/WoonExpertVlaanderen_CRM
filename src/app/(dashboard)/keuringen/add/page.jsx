@@ -304,11 +304,11 @@ const AddKeuring = () => {
                 <AlertDialogOverlay>
                   <AlertDialogContent>
                     <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                      Keuring aanpassen
+                      Keuring toevoegen
                     </AlertDialogHeader>
                     <AlertDialogBody>
                       <Text>
-                        Bent u zeker dat u deze keuring wil aanpassen?
+                        Bent u zeker dat u deze keuring wil toevoegen?
                       </Text>
                     </AlertDialogBody>
                     <AlertDialogFooter>
@@ -418,7 +418,7 @@ const AddKeuring = () => {
                 <Stack divider={<StackDivider />} spacing={3}>
                   <Box>
                     <Heading size="sm" mb={5}>
-                      Klant
+                      Keuring
                     </Heading>
                     <List>
                       <ListItem className={styles.klant}>
@@ -477,8 +477,7 @@ const AddKeuring = () => {
                             <Input
                               {...register("telefoonnummer", {
                                 required: true,
-                                pattern:
-                                  /^(?:(?:(?:\+|00)32\s?|0)(?:4[789]\d|9\d)(?:\s?\d{2}){3}|(?:(?:\+|00)32\s?|0)(?:\d\s?\d{3}|\d{2}\s?\d{2})(?:\s?\d{2}){2})$/,
+                                pattern: /^0*([1-9][0-9]*)(?:\s?\d{2}){3}$/,
                               })}
                               placeholder="Telefoonnummer"
                               type="tel"
