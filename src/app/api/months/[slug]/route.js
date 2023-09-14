@@ -20,7 +20,6 @@ export async function GET(request, { params }) {
   try {
     const res = await calendar.events.list({
       calendarId: process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST,
-      // calendarId: "dclercqpeter@gmail.com",
       timeMin: new Date(currentYear, slug - 1, 1),
       timeMax: new Date(currentYear, slug - 1, lastDay + 1),
       singleEvents: true,

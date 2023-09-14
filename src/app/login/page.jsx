@@ -1,9 +1,5 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
 import styles from "@/app/login/login.module.css";
 import Logo from "@/assets/images/WEV_LOGO.svg";
 import {
@@ -18,8 +14,10 @@ import {
   Link,
   Text,
 } from "@chakra-ui/react";
-
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {

@@ -40,7 +40,6 @@ export async function POST(request) {
       event_id_asbest: "",
     };
     if (requestData.type.includes(TypeKeuring.ASBEST)) {
-      console.log("Event toevoegen aan asbest calendar");
       calendar.events.insert(
         {
           calendarId: process.env.NEXT_PUBLIC_GMAIL_ASBEST,
@@ -57,7 +56,6 @@ export async function POST(request) {
             ...resolveObject,
             event_id_asbest: response.data.id,
           };
-          // resolve(resolveObject);
         }
       );
     }
@@ -78,7 +76,6 @@ export async function POST(request) {
         resolve(resolveObject);
       }
     );
-    console.log("Resolve object: ", resolveObject);
   });
 
   try {

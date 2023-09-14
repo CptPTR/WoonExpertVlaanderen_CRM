@@ -1,7 +1,6 @@
 "use client";
 
 import styles from "@/app/(dashboard)/keuringen/[id]/keuring.module.css";
-import EditForm from "@/components/EditKeuring/EditForm";
 import { getBackgroundStatusColor } from "@/helpers/helpers";
 import Facturatie from "@/models/Facturatie";
 import Status from "@/models/Status";
@@ -30,9 +29,7 @@ import {
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Image } from "cloudinary-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Router from "next/router";
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaHandshake, FaRegFilePdf } from "react-icons/fa";
 import { GiHouseKeys } from "react-icons/gi";

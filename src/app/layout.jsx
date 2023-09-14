@@ -2,7 +2,6 @@
 
 import "@/app/globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
-import { StrictMode } from "react";
 
 export default function RootLayout({ children }) {
   return (

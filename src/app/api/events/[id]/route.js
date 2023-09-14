@@ -15,8 +15,6 @@ export async function DELETE(request, { params }) {
     });
     const calendar = google.calendar({ version: "v3", auth });
 
-    console.log("delete Event ID: ", id);
-
     await calendar.events.delete({
       calendarId: process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST,
       eventId: id,

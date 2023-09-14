@@ -2,7 +2,6 @@
 
 import styles from "@/app/(dashboard)/keuringen/keuringen.module.css";
 import KeuringNietGevonden from "@/assets/images/keuring_niet_gevonden.png";
-import Form from "@/components/NieuweKeuring/Form";
 import { getBackgroundStatusColor } from "@/helpers/helpers";
 import Status from "@/models/Status";
 import {
@@ -34,7 +33,6 @@ import {
   MdAdd,
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight,
-  MdRefresh,
 } from "react-icons/md";
 
 const roboto900 = Roboto({ subsets: ["latin"], weight: "900" });
