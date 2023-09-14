@@ -14,7 +14,13 @@ export const sendNotifMail = async (madeBy, type, link) => {
 
     const mailOptions = {
       from: process.env.NEXT_PUBLIC_GMAIL_NOTIF_SENDER_USERNAME,
-      to: process.env.NEXT_PUBLIC_NOTIFICATION_RECEIVER,
+      to:
+        type === "EPC"
+          ? process.env.NEXT_PUBLIC_NOTIFICATION_RECEIVER
+          : [
+              process.env.NEXT_PUBLIC_NOTIFICATION_RECEIVER,
+              process.env.NEXT_PUBLIC_NOTIFICATION_RECEIVER_ASBEST,
+            ],
       subject: `Nieuwe keuring aangemaakt door ${madeBy}`,
       html: `<p>Er is een nieuwe keuringsaanvraag binnengekomen voor ${type}.</p><p>Bekijk de details van deze keuring via de volgende link: <a href="${link}">link</a></p>`,
     };
