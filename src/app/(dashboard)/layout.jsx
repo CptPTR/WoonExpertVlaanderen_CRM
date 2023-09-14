@@ -3,7 +3,7 @@
 import styles from "@/app/(dashboard)/layout.module.css";
 import Logo from "@/assets/images/WEV_LOGO.svg";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
-import { Avatar, Box, Button, Skeleton, Text } from "@chakra-ui/react";
+import { Avatar, Box, Button, Text } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Roboto } from "next/font/google";
 import Image from "next/image";
@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }) {
 
   const user = useGetCurrentUser(supabase);
 
-  const userInfo = `${user.specfield} ${user.rol}`;
+  const userInfo = `${user.specfield + " - " ?? ""} ${user.onderneming}`;
 
   const handleBtnClick = async (e) => {
     e.preventDefault();
