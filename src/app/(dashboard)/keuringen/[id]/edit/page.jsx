@@ -143,7 +143,7 @@ const EditKeuring = () => {
         setValue("klantID", keuring.Adres.Klant.id);
         setValue("voornaam", keuring.Adres.Klant.voornaam);
         setValue("familienaam", keuring.Adres.Klant.familienaam);
-        setValue("email", keuring.Adres.Klant.emailadres);
+        setValue("emailadres", keuring.Adres.Klant.emailadres);
         setValue("telefoonnummer", keuring.Adres.Klant.telefoonnummer);
 
         setValue("adresID", keuring.Adres.id);
@@ -242,7 +242,7 @@ const EditKeuring = () => {
       console.log("copy klant adres data to facturatie");
       setValue("facturatie_voornaam", getValues("voornaam"));
       setValue("facturatie_familienaam", getValues("familienaam"));
-      setValue("facturatie_email", getValues("email"));
+      setValue("facturatie_email", getValues("emailadres"));
       setValue("facturatie_telefoonnummer", getValues("telefoonnummer"));
       setValue("facturatie_straatnaam", getValues("straatnaam"));
       setValue("facturatie_nummer", getValues("nummer"));
@@ -275,7 +275,7 @@ const EditKeuring = () => {
       .update({
         voornaam: getValues("voornaam"),
         familienaam: getValues("familienaam"),
-        emailadres: getValues("email"),
+        emailadres: getValues("emailadres"),
         telefoonnummer: getValues("telefoonnummer"),
       })
       .eq("id", getValues("klantID"))
@@ -538,17 +538,17 @@ const EditKeuring = () => {
             ""
           )}
 
-          {errors.email?.type === "required" ? (
+          {errors.emailadres?.type === "required" ? (
             <Badge variant="solid" colorScheme="red">
-              Email is vereist
+              Emailadres is vereist
             </Badge>
           ) : (
             ""
           )}
 
-          {errors.email?.type === "pattern" ? (
+          {errors.emailadres?.type === "pattern" ? (
             <Badge variant="solid" colorScheme="red">
-              Email is niet geldig
+              Emailadres is niet geldig
             </Badge>
           ) : (
             ""
@@ -653,7 +653,7 @@ const EditKeuring = () => {
 
                       <Box width="100%">
                         <Input
-                          {...register("email", {
+                          {...register("emailadres", {
                             required: true,
                             pattern: { value: /\S+@\S+\.\S+/ },
                           })}
