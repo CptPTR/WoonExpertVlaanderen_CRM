@@ -41,9 +41,6 @@ const Keuringen = () => {
   const [keuringen, setKeuringen] = useState([]);
   const [zoekKeuring, setZoekKeuring] = useState("");
   const [filteredKeuringen, setFilteredKeuringen] = useState(keuringen);
-  // const [sortedKeuringen, setSortedKeuringen] = useState(
-  //   [...filteredKeuringen].reverse()
-  // );
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(filteredKeuringen.length);
@@ -62,10 +59,6 @@ const Keuringen = () => {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   });
-
-  const sortByDatumAanwijzing = () => {
-    setSortedKeuringen([...sortedKeuringen].reverse());
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
