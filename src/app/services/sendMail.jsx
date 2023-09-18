@@ -22,7 +22,10 @@ export const sendNotifMail = async (madeBy, type, link) => {
               process.env.NEXT_PUBLIC_NOTIFICATION_RECEIVER_ASBEST,
             ],
       subject: `Nieuwe keuring aangemaakt door ${madeBy}`,
-      html: `<p>Er is een nieuwe keuringsaanvraag binnengekomen voor ${type}.</p><p>Bekijk de details van deze keuring via de volgende link: <a href="${link}">link</a></p>`,
+      html: `<p>Er is een nieuwe keuringsaanvraag binnengekomen voor ${type.replace(
+        "/",
+        " + "
+      )}.</p><p>Bekijk de details van deze keuring via de volgende link: <a href="${link}">link</a></p>`,
     };
 
     await transporter.sendMail(mailOptions);
