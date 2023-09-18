@@ -41,6 +41,9 @@ const Keuringen = () => {
   const [keuringen, setKeuringen] = useState([]);
   const [zoekKeuring, setZoekKeuring] = useState("");
   const [filteredKeuringen, setFilteredKeuringen] = useState(keuringen);
+  // const [sortedKeuringen, setSortedKeuringen] = useState(
+  //   [...filteredKeuringen].reverse()
+  // );
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(filteredKeuringen.length);
@@ -50,12 +53,19 @@ const Keuringen = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = filteredKeuringen.slice(startIndex, endIndex);
+  const sortedKeuringen = currentItems.sort(
+    (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
+  );
 
   const router = useRouter();
   const supabase = createClientComponentClient({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   });
+
+  const sortByDatumAanwijzing = () => {
+    setSortedKeuringen([...sortedKeuringen].reverse());
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -183,7 +193,7 @@ const Keuringen = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {currentItems.map((keuring, index) => {
+                    {sortedKeuringen.map((keuring, index) => {
                       return (
                         <Tr key={keuring.id}>
                           <Td>
