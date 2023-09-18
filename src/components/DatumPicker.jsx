@@ -15,7 +15,6 @@ const DatumPicker = ({
   plaatsbezoekEventIdAsbest,
 }) => {
   const [startDate, setStartDate] = useState();
-  const [unavailableTimes, setUnAvailableTimes] = useState([]);
   const [isEventDateChosen, setIsEventDateChosen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,45 +25,6 @@ const DatumPicker = ({
       setStartDate(null);
     }
   }, [defaultValue]);
-
-  useEffect(() => {
-    if (startDate) {
-      const fetchEventsOfMonth = async (month) => {
-        const res = await fetch(`/api/months/${month}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const json = await res.json();
-        const unavlbleTimes = json.data.map((date) => new Date(date).getTime());
-        const oneHourInMilli = 60 * 60 * 1000;
-        const updatedTimes = unavlbleTimes.map(
-          (timestamp) => timestamp + oneHourInMilli
-        );
-        setUnAvailableTimes(updatedTimes);
-      };
-      const pickedMonth = startDate.getMonth() + 1;
-      fetchEventsOfMonth(pickedMonth);
-    }
-  }, [setUnAvailableTimes, startDate]);
-
-  const filterTime = (time) => {
-    const currentDate = new Date();
-    const selectedDate = new Date(time);
-
-    currentDate.setHours(currentDate.getHours() + 1);
-    selectedDate.setHours(selectedDate.getHours() + 1);
-
-    const oneHourInMilli = 60 * 60 * 1000;
-
-    const isUnavailable = unavailableTimes.some(
-      (unavailableTime) =>
-        selectedDate.getTime() >= unavailableTime &&
-        selectedDate.getTime() < unavailableTime + oneHourInMilli
-    );
-    return !isUnavailable && currentDate.getTime() < selectedDate.getTime();
-  };
 
   const isWeekday = (date) => {
     const day = date.getDay();
@@ -95,6 +55,10 @@ const DatumPicker = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          voornaam: getValues("voornaam"),
+          familienaam: getValues("familienaam"),
+          emailadres: getValues("emailadres"),
+          telefoonnummer: getValues("telefoonnummer"),
           straatnaam: getValues("straatnaam"),
           nummer: getValues("nummer"),
           postcode: getValues("postcode"),
@@ -167,21 +131,6 @@ const DatumPicker = ({
           console.error("Error deleting event: ", responseAsbest.statusText);
         }
       }
-
-      if (response.ok || responseAsbest.ok) {
-        console.log("Event deleted successfully");
-      } else {
-        console.error(
-          "Error deleting event: ",
-          response.status,
-          response.statusText
-        );
-        console.error(
-          "Error deleting event: ",
-          responseAsbest.status,
-          responseAsbest.statusText
-        );
-      }
     } catch (error) {
       console.error("Error: ", error);
     }
@@ -203,7 +152,6 @@ const DatumPicker = ({
               }
               selected={field.value ? new Date(field.value) : null}
               placeholderText="Geen datum geselecteerd"
-              filterTime={filterTime}
               filterDate={isWeekday}
               timeIntervals={15}
               calendarStartDay={1}
