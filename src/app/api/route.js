@@ -6,9 +6,15 @@ export async function POST(request) {
   const requestData = await request.json();
 
   const event = {
-    summary: `${requestData.type} - ${requestData.straatnaam} ${requestData.nummer}, ${requestData.postcode} ${requestData.gemeente}`,
+    summary: `${requestData.type.replace("/", " + ")} - ${
+      requestData.straatnaam
+    } ${requestData.nummer}, ${requestData.postcode} ${requestData.gemeente}`,
     location: `${requestData.straatnaam} ${requestData.nummer}, ${requestData.postcode} ${requestData.gemeente}`,
-    description: `${requestData.type} keuring`,
+    description: `${requestData.type.replace("/", " + ")} keuring\n${
+      requestData.voornaam
+    } ${requestData.familienaam}\n${requestData.emailadres}\n${
+      requestData.telefoonnummer
+    }`,
     start: {
       dateTime: requestData.datumPlaatsbezoek,
       timeZone: "UTC",
@@ -21,6 +27,7 @@ export async function POST(request) {
 
   const newEndDate = new Date(event.end.dateTime);
   newEndDate.setHours(newEndDate.getHours() + 1);
+  newEndDate.setMinutes(newEndDate.getMinutes() + 30);
   event.end.dateTime = newEndDate.toISOString();
 
   const auth = new google.auth.JWT({
@@ -59,7 +66,7 @@ export async function POST(request) {
         }
       );
     }
-    console.log("Event toevoegen aan EPC/Asbest calendar");
+
     calendar.events.insert(
       {
         calendarId: process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST,
