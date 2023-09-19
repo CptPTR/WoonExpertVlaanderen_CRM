@@ -1150,13 +1150,7 @@ const EditKeuring = () => {
                     defaultValue={datumPlaatsbezoek || null}
                     plaatsbezoekEventId={pbEventId}
                     plaatsbezoekEventIdAsbest={pbEventIdAsbest}
-                    // datumPlaatsbezoek={datumPlaatsbezoek}
                     control={control}
-                    // watchDatumPlaatsbezoek={watchDatumPlaatsbezoek}
-                    // watchPlaatsbezoekEventId={watchPlaatsbezoekEventId}
-                    // watchPlaatsbezoekEventIdAsbest={
-                    //   watchPlaatsbezoekEventIdAsbest
-                    // }
                   />
                 </CardBody>
               </Card>

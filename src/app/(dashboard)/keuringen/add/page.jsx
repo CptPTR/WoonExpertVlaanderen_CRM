@@ -102,6 +102,7 @@ const AddKeuring = () => {
 
       datumPlaatsbezoek: null,
       plaatsbezoekEventId: null,
+      plaatsbezoekEventIdAsbest: null,
       status: Status.NIEUW,
       zaakvoerder: "d454c7cd-f3d4-4df8-a1d0-2d9912b14560",
 
@@ -120,10 +121,8 @@ const AddKeuring = () => {
     control,
     name: "datumPlaatsbezoek",
   });
-  const watchPlaatsbezoekEventId = useWatch({
-    control,
-    name: "plaatsbezoekEventId",
-  });
+  const pbEventId = watch("plaatsbezoekEventId");
+  const pbEventIdAsbest = watch("plaatsbezoekEventIdAsbest");
 
   const onSubmit = (d) => {
     onUploadKeuringConfirmationOpen();
@@ -236,6 +235,8 @@ const AddKeuring = () => {
           created_by: user.id,
           opmerking: getValues("opmerking"),
           toegang_eenheid: getValues("toegang_eenheid"),
+          eventID: getValues("plaatsbezoekEventId"),
+          eventIDAsbest: getValues("plaatsbezoekEventIdAsbest"),
         })
         .select();
 
@@ -674,8 +675,8 @@ const AddKeuring = () => {
                     setValue={setValue}
                     getValues={getValues}
                     control={control}
-                    watchDatumPlaatsbezoek={watchDatumPlaatsbezoek}
-                    watchPlaatsbezoekEventId={watchPlaatsbezoekEventId}
+                    plaatsbezoekEventId={pbEventId}
+                    plaatsbezoekEventIdAsbest={pbEventIdAsbest}
                   />
                 </CardBody>
               </Card>

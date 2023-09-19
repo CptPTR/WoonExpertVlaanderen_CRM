@@ -34,7 +34,6 @@ const DatumPicker = ({
   const addEvent = async () => {
     setIsLoading(true);
 
-    console.log("FETCH NOW");
     try {
       if (plaatsbezoekEventId) {
         deleteEvent(
@@ -71,12 +70,12 @@ const DatumPicker = ({
 
       const responseData = await response.json();
 
-      if (responseData.resolveObject.event_id !== "") {
+      if (responseData.resolveObject.event_id) {
         setValue("plaatsbezoekEventId", responseData.resolveObject.event_id);
         setIsEventDateChosen(false);
       }
 
-      if (responseData.resolveObject.event_id_asbest !== "") {
+      if (responseData.resolveObject.event_id_asbest) {
         setValue(
           "plaatsbezoekEventIdAsbest",
           responseData.resolveObject.event_id_asbest
