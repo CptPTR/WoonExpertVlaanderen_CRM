@@ -27,7 +27,7 @@ import {
 
 const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
   const [currentFacturatieNaar, setCurrentFacturatieNaar] = useState(
-    Facturatie.IMMO
+    Facturatie.HETZELFDE
   );
 
   useEffect(() => {
