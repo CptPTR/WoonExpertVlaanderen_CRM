@@ -102,7 +102,7 @@ const EditKeuring = () => {
       gemeente: "",
 
       facturatie_id: "",
-      facturatie_naar: Facturatie.IMMO,
+      facturatie_naar: null,
       facturatie_voornaam: "",
       facturatie_familienaam: "",
       facturatie_email: "",
@@ -127,6 +127,28 @@ const EditKeuring = () => {
       opmerking: "",
     },
   });
+
+  const watchFacturatieNaar = useWatch({ control, name: "facturatie_naar" });
+  const watchType = useWatch({ control, name: "type" });
+  const watchCertEpc = useWatch({ control, name: "certificaat_epc" });
+  const watchCertAsbest = useWatch({ control, name: "certificaat_asbest" });
+  const watchExtraDocumenten = useWatch({ control, name: "extraDocumenten" });
+  const datumPlaatsbezoek = watch("datumPlaatsbezoek");
+  const pbEventId = watch("plaatsbezoekEventId");
+  const pbEventIdAsbest = watch("plaatsbezoekEventIdAsbest");
+
+  useEffect(() => {
+    if (watchFacturatieNaar !== Facturatie.ANDERS) {
+      resetField("facturatie_voornaam");
+      resetField("facturatie_familienaam");
+      resetField("facturatie_email");
+      resetField("facturatie_telefoonnummer");
+      resetField("facturatie_straatnaam");
+      resetField("facturatie_nummer");
+      resetField("facturatie_postcode");
+      resetField("facturatie_gemeente");
+    }
+  }, [watchFacturatieNaar]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -219,52 +241,15 @@ const EditKeuring = () => {
     fetchData();
   }, [params.id]);
 
-  const watchFacturatieNaar = useWatch({ control, name: "facturatie_naar" });
-  const watchType = useWatch({ control, name: "type" });
-  const watchCertEpc = useWatch({ control, name: "certificaat_epc" });
-  const watchCertAsbest = useWatch({ control, name: "certificaat_asbest" });
-  const watchExtraDocumenten = useWatch({ control, name: "extraDocumenten" });
-  const watchDatumPlaatsbezoek = useWatch({
-    control,
-    name: "datumPlaatsbezoek",
-  });
-  const watchPlaatsbezoekEventId = useWatch({
-    control,
-    name: "plaatsbezoekEventId",
-  });
-  const watchPlaatsbezoekEventIdAsbest = useWatch({
-    control,
-    name: "plaatsbezoekEventIdAsbest",
-  });
-
-  useEffect(() => {
-    if (watchFacturatieNaar == Facturatie.ANDERS) {
-      console.log("copy klant adres data to facturatie");
-      setValue("facturatie_voornaam", getValues("voornaam"));
-      setValue("facturatie_familienaam", getValues("familienaam"));
-      setValue("facturatie_email", getValues("emailadres"));
-      setValue("facturatie_telefoonnummer", getValues("telefoonnummer"));
-      setValue("facturatie_straatnaam", getValues("straatnaam"));
-      setValue("facturatie_nummer", getValues("nummer"));
-      setValue("facturatie_postcode", getValues("postcode"));
-      setValue("facturatie_gemeente", getValues("gemeente"));
-    } else {
-      resetField("facturatie_voornaam");
-      resetField("facturatie_familienaam");
-      resetField("facturatie_email");
-      resetField("facturatie_telefoonnummer");
-      resetField("facturatie_straatnaam");
-      resetField("facturatie_nummer");
-      resetField("facturatie_postcode");
-      resetField("facturatie_gemeente");
-    }
-  }, [watchFacturatieNaar]);
-
   const onSubmit = () => {
     onEditKeuringConfirmationOpen();
   };
 
   const handleEditKeuring = async () => {
+    if (datumPlaatsbezoek) {
+      await addEvent();
+    }
+
     let klantID = null;
     let adresID = null;
     let facturatieID = null;
@@ -317,7 +302,7 @@ const EditKeuring = () => {
             : null,
         nummer:
           getValues("facturatie_naar") == Facturatie.ANDERS
-            ? +getValues("facturatie_nummer")
+            ? getValues("facturatie_nummer")
             : null,
         postcode:
           getValues("facturatie_naar") == Facturatie.ANDERS
@@ -463,9 +448,98 @@ const EditKeuring = () => {
     }
   };
 
-  const datumPlaatsbezoek = watch("datumPlaatsbezoek");
-  const pbEventId = watch("plaatsbezoekEventId");
-  const pbEventIdAsbest = watch("plaatsbezoekEventIdAsbest");
+  const addEvent = async () => {
+    try {
+      if (pbEventId) {
+        deleteEvent(pbEventId, process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST);
+      }
+
+      if (pbEventIdAsbest) {
+        deleteEvent(pbEventIdAsbest, process.env.NEXT_PUBLIC_GMAIL_ASBEST);
+      }
+
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voornaam: getValues("voornaam"),
+          familienaam: getValues("familienaam"),
+          emailadres: getValues("emailadres"),
+          telefoonnummer: getValues("telefoonnummer"),
+          straatnaam: getValues("straatnaam"),
+          nummer: getValues("nummer"),
+          postcode: getValues("postcode"),
+          gemeente: getValues("gemeente"),
+          type: getValues("type"),
+          datumPlaatsbezoek: getValues("datumPlaatsbezoek"),
+        }),
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.resolveObject.event_id) {
+        setValue("plaatsbezoekEventId", responseData.resolveObject.event_id);
+      }
+
+      if (responseData.resolveObject.event_id_asbest) {
+        setValue(
+          "plaatsbezoekEventIdAsbest",
+          responseData.resolveObject.event_id_asbest
+        );
+      }
+      setValue("status", Status.INGEPLAND);
+    } catch (error) {
+      console.error("Fetch error: ", error);
+    }
+  };
+
+  const deleteEvent = async (eventId, calendar) => {
+    try {
+      const evId = eventId;
+
+      if (calendar == process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST) {
+        if (!eventId) {
+          console.error("Event ID is undefined");
+        }
+
+        const response = await fetch(`/api/events/${evId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          console.log("Event deleted successfully");
+        } else {
+          console.error("Error deleting event: ", response.statusText);
+        }
+      }
+
+      if (calendar == process.env.NEXT_PUBLIC_GMAIL_ASBEST) {
+        if (!evId) {
+          console.error("Event ID Asbest is undefined");
+        }
+
+        const responseAsbest = await fetch(`/api/events/asbest/${evId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (responseAsbest.ok) {
+          console.log("Event deleted successfully");
+        } else {
+          console.error("Error deleting event: ", responseAsbest.statusText);
+        }
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+    }
+  };
 
   return (
     <Box display="flex" flexDirection="column">
