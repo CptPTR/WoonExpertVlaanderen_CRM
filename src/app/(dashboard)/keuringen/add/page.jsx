@@ -1,6 +1,8 @@
 "use client";
 
+import { sendNotifMail } from "@/app/services/sendMail";
 import CheckboxTypeKeuring from "@/components/CheckboxTypeKeuring";
+import DatumPicker from "@/components/DatumPicker";
 import ExtraDocumentenDropzone from "@/components/ExtraDocumentenDropzone";
 import FacturatieCard from "@/components/FacturatieCard";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
@@ -38,6 +40,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
@@ -49,9 +52,6 @@ import {
   MdPhone,
 } from "react-icons/md";
 import styles from "./keuringAdd.module.css";
-import DatumPicker from "@/components/DatumPicker";
-import { useRouter } from "next/navigation";
-import { sendNotifMail } from "@/app/services/sendMail";
 
 const AddKeuring = () => {
   const cancelRef = useRef();
@@ -90,7 +90,7 @@ const AddKeuring = () => {
       gemeente: "",
 
       facturatie_id: "",
-      facturatie_naar: Facturatie.IMMO,
+      facturatie_naar: Facturatie.HETZELFDE,
       facturatie_voornaam: "",
       facturatie_familienaam: "",
       facturatie_emailadres: "",
@@ -129,6 +129,10 @@ const AddKeuring = () => {
   };
 
   const handleUploadKeuring = async () => {
+    if (watchDatumPlaatsbezoek) {
+      await addEvent();
+    }
+
     let klantID = null;
     let adresID = null;
     let facturatieID = null;
@@ -279,6 +283,99 @@ const AddKeuring = () => {
       `https://my.woonexpertvlaanderen.be/keuringen/${keuringID}`
     );
     router.replace("/keuringen");
+  };
+
+  const addEvent = async () => {
+    try {
+      if (pbEventId) {
+        deleteEvent(pbEventId, process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST);
+      }
+
+      if (pbEventIdAsbest) {
+        deleteEvent(pbEventIdAsbest, process.env.NEXT_PUBLIC_GMAIL_ASBEST);
+      }
+
+      const response = await fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voornaam: getValues("voornaam"),
+          familienaam: getValues("familienaam"),
+          emailadres: getValues("emailadres"),
+          telefoonnummer: getValues("telefoonnummer"),
+          straatnaam: getValues("straatnaam"),
+          nummer: getValues("nummer"),
+          postcode: getValues("postcode"),
+          gemeente: getValues("gemeente"),
+          type: getValues("type"),
+          datumPlaatsbezoek: getValues("datumPlaatsbezoek"),
+        }),
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.resolveObject.event_id) {
+        setValue("plaatsbezoekEventId", responseData.resolveObject.event_id);
+      }
+
+      if (responseData.resolveObject.event_id_asbest) {
+        setValue(
+          "plaatsbezoekEventIdAsbest",
+          responseData.resolveObject.event_id_asbest
+        );
+      }
+      setValue("status", Status.INGEPLAND);
+    } catch (error) {
+      console.error("Fetch error: ", error);
+    }
+  };
+
+  const deleteEvent = async (eventId, calendar) => {
+    try {
+      const evId = eventId;
+
+      if (calendar == process.env.NEXT_PUBLIC_GMAIL_EPC_ASBEST) {
+        if (!eventId) {
+          console.error("Event ID is undefined");
+        }
+
+        const response = await fetch(`/api/events/${evId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          console.log("Event deleted successfully");
+        } else {
+          console.error("Error deleting event: ", response.statusText);
+        }
+      }
+
+      if (calendar == process.env.NEXT_PUBLIC_GMAIL_ASBEST) {
+        if (!evId) {
+          console.error("Event ID Asbest is undefined");
+        }
+
+        const responseAsbest = await fetch(`/api/events/asbest/${evId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (responseAsbest.ok) {
+          console.log("Event deleted successfully");
+        } else {
+          console.error("Error deleting event: ", responseAsbest.statusText);
+        }
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+    }
   };
 
   return (
