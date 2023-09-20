@@ -156,7 +156,7 @@ const Keuringen = () => {
           </InputGroup>
         </Box>
       </Box>
-      <Box>
+      <Box mb={10}>
         <div className={styles.keuringenContainer}>
           {filteredKeuringen.length > 0 ? (
             <Box>
