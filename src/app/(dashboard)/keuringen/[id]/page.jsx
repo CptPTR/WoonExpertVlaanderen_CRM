@@ -319,7 +319,7 @@ const Keuring = ({ params }) => {
         <Box display="flex" alignItems="center" p={3}>
           <FaArrowLeft
             size={28}
-            onClick={() => router.back()}
+            onClick={() => router.replace("/keuringen")}
             className={styles.backBtn}
           />
           <Heading size="md" ml={3}>

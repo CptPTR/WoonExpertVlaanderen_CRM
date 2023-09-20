@@ -41,7 +41,7 @@ import {
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import {
@@ -56,6 +56,7 @@ import styles from "./keuringAdd.module.css";
 const AddKeuring = () => {
   const cancelRef = useRef();
   const router = useRouter();
+  const [isEventChosen, setIsEventChosen] = useState(false);
 
   const {
     isOpen: isUploadKeuringConfirmationOpen,
@@ -129,7 +130,7 @@ const AddKeuring = () => {
   };
 
   const handleUploadKeuring = async () => {
-    if (watchDatumPlaatsbezoek) {
+    if (isEventChosen) {
       await addEvent();
     }
 
@@ -318,6 +319,7 @@ const AddKeuring = () => {
 
       if (responseData.resolveObject.event_id) {
         setValue("plaatsbezoekEventId", responseData.resolveObject.event_id);
+        setIsEventChosen(false);
       }
 
       if (responseData.resolveObject.event_id_asbest) {
@@ -325,6 +327,7 @@ const AddKeuring = () => {
           "plaatsbezoekEventIdAsbest",
           responseData.resolveObject.event_id_asbest
         );
+        setIsEventChosen(false);
       }
       setValue("status", Status.INGEPLAND);
     } catch (error) {
@@ -774,6 +777,7 @@ const AddKeuring = () => {
                     control={control}
                     plaatsbezoekEventId={pbEventId}
                     plaatsbezoekEventIdAsbest={pbEventIdAsbest}
+                    setIsEventChosen={setIsEventChosen}
                   />
                 </CardBody>
               </Card>

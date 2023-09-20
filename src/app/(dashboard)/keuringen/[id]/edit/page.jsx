@@ -49,7 +49,7 @@ import {
 } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import {
@@ -65,6 +65,7 @@ const EditKeuring = () => {
   const params = useParams();
   const cancelRef = useRef();
   const router = useRouter();
+  const [isEventChosen, setIsEventChosen] = useState(false);
 
   const supabase = createClientComponentClient({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -246,7 +247,7 @@ const EditKeuring = () => {
   };
 
   const handleEditKeuring = async () => {
-    if (datumPlaatsbezoek) {
+    if (isEventChosen) {
       await addEvent();
     }
 
@@ -481,6 +482,7 @@ const EditKeuring = () => {
 
       if (responseData.resolveObject.event_id) {
         setValue("plaatsbezoekEventId", responseData.resolveObject.event_id);
+        setIsEventChosen(false);
       }
 
       if (responseData.resolveObject.event_id_asbest) {
@@ -488,6 +490,7 @@ const EditKeuring = () => {
           "plaatsbezoekEventIdAsbest",
           responseData.resolveObject.event_id_asbest
         );
+        setIsEventChosen(false);
       }
       setValue("status", Status.INGEPLAND);
     } catch (error) {
@@ -1225,6 +1228,7 @@ const EditKeuring = () => {
                     plaatsbezoekEventId={pbEventId}
                     plaatsbezoekEventIdAsbest={pbEventIdAsbest}
                     control={control}
+                    setIsEventChosen={setIsEventChosen}
                   />
                 </CardBody>
               </Card>

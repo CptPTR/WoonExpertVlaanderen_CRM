@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Controller } from "react-hook-form";
 
-const DatumPicker = ({ setValue, control, defaultValue }) => {
+const DatumPicker = ({ setValue, control, defaultValue, setIsEventChosen }) => {
   const [startDate, setStartDate] = useState();
 
   useEffect(() => {
@@ -48,6 +48,7 @@ const DatumPicker = ({ setValue, control, defaultValue }) => {
               onChange={(date) => {
                 setStartDate(date);
                 setValue("datumPlaatsbezoek", date);
+                setIsEventChosen(true);
               }}
             />
           )}
