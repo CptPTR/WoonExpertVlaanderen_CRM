@@ -403,7 +403,7 @@ const Keuring = ({ params }) => {
         </Box>
       </Box>
 
-      <Box>
+      <Box mb={10}>
         <div className={styles.keuringContainer}>
           <Box display="flex" gap="20px">
             <Box className={styles.cardBox} width="fit-content">
@@ -420,9 +420,7 @@ const Keuring = ({ params }) => {
                         size={24}
                         style={{ margin: "0 20px" }}
                       />
-                      {/* <Skeleton isLoaded={isLoading}> */}
                       {keuring.klant.email}
-                      {/* </Skeleton> */}
                     </ListItem>
                     <ListItem className={styles.klant} fontSize="sm">
                       <MdPhone size={24} style={{ margin: "0 20px" }} />
@@ -677,7 +675,6 @@ const Keuring = ({ params }) => {
           </Box>
         </div>
       </Box>
-      {/* </main> */}
     </Box>
   );
 };
