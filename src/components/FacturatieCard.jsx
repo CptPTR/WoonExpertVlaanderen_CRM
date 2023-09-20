@@ -76,7 +76,7 @@ const FacturatieCard = ({ register, formValues, setValue, resetField }) => {
           <RadioGroup
             size="sm"
             colorScheme="green"
-            defaultValue={Facturatie.IMMO}
+            defaultValue={Facturatie.HETZELFDE}
             pl={5}
             pb={5}
           >
