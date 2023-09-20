@@ -19,7 +19,9 @@ export default function DashboardLayout({ children }) {
 
   const user = useGetCurrentUser(supabase);
 
-  const userInfo = `${user.specfield + " - " ?? ""} ${user.onderneming}`;
+  const userInfo = `${user.specfield ? user.specfield + " - " : ""} ${
+    user.onderneming
+  }`;
 
   const handleBtnClick = async (e) => {
     e.preventDefault();
