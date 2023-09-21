@@ -49,10 +49,13 @@ const Keuringen = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredKeuringen.slice(startIndex, endIndex);
-  const sortedKeuringen = currentItems.sort(
+  const sortedKeuringen = filteredKeuringen.sort(
     (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
   );
+  const currentItems = sortedKeuringen.slice(startIndex, endIndex);
+  // const sortedKeuringen = currentItems.sort(
+  //   (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
+  // );
 
   const router = useRouter();
   const supabase = createClientComponentClient({
@@ -187,7 +190,7 @@ const Keuringen = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {sortedKeuringen.map((keuring, index) => {
+                    {currentItems.map((keuring, index) => {
                       return (
                         <Tr key={keuring.id}>
                           <Td>
