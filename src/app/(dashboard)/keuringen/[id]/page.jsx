@@ -213,10 +213,11 @@ const Keuring = ({ params }) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    const hours = date.getHours();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
     const amOrPm = hours >= 12 ? "PM" : "AM";
 
-    return `${day}/${month}/${year} ${amOrPm}`;
+    return `${day}/${month}/${year} ${hours}:${minutes} ${amOrPm}`;
   };
 
   const formatFileSize = (bytes) => {
@@ -350,7 +351,7 @@ const Keuring = ({ params }) => {
             <TagLabel>
               {keuring.status +
                 (keuring.status == Status.INGEPLAND
-                  ? " -> " + formatDate(keuring.datumPlaatsbezoek)
+                  ? ": " + formatDate(keuring.datumPlaatsbezoek)
                   : "")}
             </TagLabel>
           </Tag>
