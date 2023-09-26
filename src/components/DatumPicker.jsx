@@ -16,11 +16,6 @@ const DatumPicker = ({ setValue, control, defaultValue, setIsEventChosen }) => {
     }
   }, [defaultValue]);
 
-  const isWeekday = (date) => {
-    const day = date.getDay();
-    return day !== 0 && day !== 6;
-  };
-
   return (
     <Box display="flex" flexDirection="column" alignItems="flex-start">
       <Box>
@@ -37,7 +32,6 @@ const DatumPicker = ({ setValue, control, defaultValue, setIsEventChosen }) => {
               }
               selected={field.value ? new Date(field.value) : null}
               placeholderText="Geen datum geselecteerd"
-              filterDate={isWeekday}
               timeIntervals={15}
               calendarStartDay={1}
               minTime={new Date().setHours(7, 0, 0, 0)}

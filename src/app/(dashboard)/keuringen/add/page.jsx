@@ -278,7 +278,7 @@ const AddKeuring = () => {
     }
 
     onUploadKeuringConfirmationClose();
-    sendNotifMail(
+    await sendNotifMail(
       user.onderneming,
       getValues("type"),
       `https://my.woonexpertvlaanderen.be/keuringen/${keuringID}`
