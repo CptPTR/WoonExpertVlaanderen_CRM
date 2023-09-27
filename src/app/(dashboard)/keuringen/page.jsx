@@ -44,14 +44,29 @@ const Keuringen = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(filteredKeuringen.length);
-  const itemsPerPage = 8;
+  const itemsPerPage = 12;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const sortedKeuringen = filteredKeuringen.sort(
-    (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
-  );
+
+  const keuringenOrder = Object.values(Status);
+  const sortedKeuringen = filteredKeuringen.sort((a, b) => {
+    const indexA = keuringenOrder.indexOf(a.status);
+    const indexB = keuringenOrder.indexOf(b.status);
+
+    if (indexA === indexB) {
+      const dateA = new Date(a.datumPlaatsbezoek);
+      const dateB = new Date(b.datumPlaatsbezoek);
+      return dateA - dateB;
+    } else if (a.status === Status.CERTIFICAAT) {
+      return 1;
+    } else if (b.status === Status.CERTIFICAAT) {
+      return -1;
+    } else {
+      return indexA - indexB;
+    }
+  });
   const currentItems = sortedKeuringen.slice(startIndex, endIndex);
   // const sortedKeuringen = currentItems.sort(
   //   (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
