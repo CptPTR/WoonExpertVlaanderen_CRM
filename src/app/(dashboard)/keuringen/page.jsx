@@ -50,27 +50,22 @@ const Keuringen = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  const keuringenOrder = Object.values(Status);
   const sortedKeuringen = filteredKeuringen.sort((a, b) => {
-    const indexA = keuringenOrder.indexOf(a.status);
-    const indexB = keuringenOrder.indexOf(b.status);
-
-    if (indexA === indexB) {
-      const dateA = new Date(a.datumPlaatsbezoek);
-      const dateB = new Date(b.datumPlaatsbezoek);
-      return dateA - dateB;
-    } else if (a.status === Status.CERTIFICAAT) {
+    if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
       return 1;
-    } else if (b.status === Status.CERTIFICAAT) {
-      return -1;
-    } else {
-      return indexA - indexB;
     }
+    if (b.status === Status.CERTIFICAAT && a.status !== Status.CERTIFICAAT) {
+      return -1;
+    }
+
+    const dateA = new Date(a.datumPlaatsbezoek);
+    const dateB = new Date(b.datumPlaatsbezoek);
+
+    if (dateA < dateB) return -1;
+    if (dateA > dateB) return 1;
+    return 0;
   });
   const currentItems = sortedKeuringen.slice(startIndex, endIndex);
-  // const sortedKeuringen = currentItems.sort(
-  //   (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
-  // );
 
   const router = useRouter();
   const supabase = createClientComponentClient({
