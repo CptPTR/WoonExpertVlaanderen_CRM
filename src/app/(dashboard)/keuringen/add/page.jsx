@@ -105,7 +105,7 @@ const AddKeuring = () => {
       plaatsbezoekEventId: null,
       plaatsbezoekEventIdAsbest: null,
       status: Status.NIEUW,
-      zaakvoerder: "d454c7cd-f3d4-4df8-a1d0-2d9912b14560",
+      zaakvoerder: process.env.NEXT_PUBLIC_ZAAKVOERDER,
 
       certificaat_epc: "",
       certificaat_asbest: "",

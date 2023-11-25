@@ -51,6 +51,13 @@ const Keuringen = () => {
   const endIndex = startIndex + itemsPerPage;
 
   const sortedKeuringen = filteredKeuringen.sort((a, b) => {
+    if (a.status === Status.NIEUW && b.status !== Status.NIEUW) {
+      return -1;
+    }
+    if (b.status === Status.NIEUW && a.status !== Status.NIEUW) {
+      return 1;
+    }
+
     if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
       return 1;
     }
@@ -58,11 +65,11 @@ const Keuringen = () => {
       return -1;
     }
 
-    const dateA = new Date(a.datumPlaatsbezoek);
-    const dateB = new Date(b.datumPlaatsbezoek);
+    const dateTwA = new Date(a.datumToewijzing);
+    const dateTwB = new Date(b.datumToewijzing);
 
-    if (dateA < dateB) return -1;
-    if (dateA > dateB) return 1;
+    if (dateTwA > dateTwB) return -1;
+    if (dateTwA < dateTwB) return 1;
     return 0;
   });
   const currentItems = sortedKeuringen.slice(startIndex, endIndex);
