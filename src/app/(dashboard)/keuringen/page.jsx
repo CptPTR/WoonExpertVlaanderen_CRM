@@ -49,10 +49,30 @@ const Keuringen = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredKeuringen.slice(startIndex, endIndex);
-  const sortedKeuringen = currentItems.sort(
-    (a, b) => new Date(b.datumToewijzing) - new Date(a.datumToewijzing)
-  );
+
+  const sortedKeuringen = filteredKeuringen.sort((a, b) => {
+    if (a.status === Status.NIEUW && b.status !== Status.NIEUW) {
+      return -1;
+    }
+    if (b.status === Status.NIEUW && a.status !== Status.NIEUW) {
+      return 1;
+    }
+
+    if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
+      return 1;
+    }
+    if (b.status === Status.CERTIFICAAT && a.status !== Status.CERTIFICAAT) {
+      return -1;
+    }
+
+    const dateTwA = new Date(a.datumToewijzing);
+    const dateTwB = new Date(b.datumToewijzing);
+
+    if (dateTwA > dateTwB) return -1;
+    if (dateTwA < dateTwB) return 1;
+    return 0;
+  });
+  const currentItems = sortedKeuringen.slice(startIndex, endIndex);
 
   const router = useRouter();
   const supabase = createClientComponentClient({
