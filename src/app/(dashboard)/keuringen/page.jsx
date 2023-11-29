@@ -261,11 +261,9 @@ const Keuringen = () => {
                               }}
                             >
                               <Text fontSize="small">
-                                {keuring.status +
-                                  (keuring.status == Status.INGEPLAND
-                                    ? ": " +
-                                      formatDate(keuring.datumPlaatsbezoek)
-                                    : "")}
+                                {keuring.status !== Status.INGEPLAND
+                                  ? keuring.status
+                                  : formatDate(keuring.datumPlaatsbezoek)}
                               </Text>
                             </div>
                           </Td>

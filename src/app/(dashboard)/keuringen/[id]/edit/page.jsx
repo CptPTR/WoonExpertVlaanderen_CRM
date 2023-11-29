@@ -755,8 +755,7 @@ const EditKeuring = () => {
                           <Input
                             {...register("telefoonnummer", {
                               required: true,
-                              pattern:
-                                /^(?:(?:\+|00)32\s?|)(?:(?:4[789]\d|9\d)(?:\s?\d{2}){3}|(?:(?:\+|00)32\s?|)(?:\d\s?\d{3}|\d{2}\s?\d{2})(?:\s?\d{2}){2})$/,
+                              pattern: /^0*([1-9][0-9]*)(?:\s?\d{2}){3}$/,
                             })}
                             placeholder="Telefoonnummer"
                             type="tel"
