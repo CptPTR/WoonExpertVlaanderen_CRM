@@ -51,61 +51,32 @@ const Keuringen = () => {
   const endIndex = startIndex + itemsPerPage;
 
   const sortedKeuringen = filteredKeuringen.sort((a, b) => {
-    const dateTwA = new Date(a.datumToewijzing);
-    const dateTwB = new Date(b.datumToewijzing);
-    const datePbA = new Date(a.datumPlaatsbezoek);
-    const datePbB = new Date(b.datumPlaatsbezoek);
+    const statusOrder = {
+      [Status.NIEUW]: 1,
+      [Status.INGEPLAND]: 2,
+      [Status.IN_BEHANDELING]: 3,
+      [Status.CERTIFICAAT]: 4,
+    };
 
-    if (a.status === Status.NIEUW && b.status !== Status.NIEUW) {
-      return -1;
-    }
-    if (a.status !== Status.NIEUW && b.status === Status.NIEUW) {
-      return 1;
-    }
+    const getStatusOrder = (status) => statusOrder[status] || 0;
 
-    if (a.status === Status.INGEPLAND && b.status !== Status.INGEPLAND) {
-      return -1;
+    const compareStatus = getStatusOrder(a.status) - getStatusOrder(b.status);
+    if (compareStatus !== 0) {
+      return compareStatus;
     }
-    if (a.status !== Status.INGEPLAND && b.status === Status.INGEPLAND) {
-      return 1;
-    }
+    const dateComparator = (dateA, dateB) => {
+      const dateAObj = new Date(dateA);
+      const dateBObj = new Date(dateB);
+      return dateAObj - dateBObj;
+    };
 
-    if (
-      a.status === Status.IN_BEHANDELING &&
-      b.status !== Status.IN_BEHANDELING
-    ) {
-      return -1;
-    }
-    if (
-      a.status !== Status.IN_BEHANDELING &&
-      b.status === Status.IN_BEHANDELING
-    ) {
-      return 1;
+    if (a.status === Status.INGEPLAND || a.status === Status.IN_BEHANDELING) {
+      return dateComparator(a.datumPlaatsbezoek, b.datumPlaatsbezoek);
     }
 
-    if (datePbA < datePbB) return -1;
-    if (datePbA > datePbB) return 1;
-
-    if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
-      return -1;
+    if (a.status === Status.NIEUW || a.status === Status.CERTIFICAAT) {
+      return -dateComparator(a.datumToewijzing, b.datumToewijzing);
     }
-    if (a.status !== Status.CERTIFICAAT && b.status === Status.CERTIFICAAT) {
-      return 1;
-    }
-    // if (b.status === Status.NIEUW && a.status !== Status.NIEUW) {
-    //   return 1;
-    // }
-
-    // if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
-    //   return 1;
-    // }
-    // if (b.status === Status.CERTIFICAAT && a.status !== Status.CERTIFICAAT) {
-    //   return -1;
-    // }
-
-    if (dateTwA > dateTwB) return -1;
-    if (dateTwA < dateTwB) return 1;
-    return 0;
   });
   const currentItems = sortedKeuringen.slice(startIndex, endIndex);
 
