@@ -51,22 +51,57 @@ const Keuringen = () => {
   const endIndex = startIndex + itemsPerPage;
 
   const sortedKeuringen = filteredKeuringen.sort((a, b) => {
+    const dateTwA = new Date(a.datumToewijzing);
+    const dateTwB = new Date(b.datumToewijzing);
+    const datePbA = new Date(a.datumPlaatsbezoek);
+    const datePbB = new Date(b.datumPlaatsbezoek);
+
     if (a.status === Status.NIEUW && b.status !== Status.NIEUW) {
       return -1;
     }
-    if (b.status === Status.NIEUW && a.status !== Status.NIEUW) {
+    if (a.status !== Status.NIEUW && b.status === Status.NIEUW) {
       return 1;
     }
 
-    if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
-      return 1;
-    }
-    if (b.status === Status.CERTIFICAAT && a.status !== Status.CERTIFICAAT) {
+    if (a.status === Status.INGEPLAND && b.status !== Status.INGEPLAND) {
       return -1;
     }
+    if (a.status !== Status.INGEPLAND && b.status === Status.INGEPLAND) {
+      return 1;
+    }
 
-    const dateTwA = new Date(a.datumToewijzing);
-    const dateTwB = new Date(b.datumToewijzing);
+    if (
+      a.status === Status.IN_BEHANDELING &&
+      b.status !== Status.IN_BEHANDELING
+    ) {
+      return -1;
+    }
+    if (
+      a.status !== Status.IN_BEHANDELING &&
+      b.status === Status.IN_BEHANDELING
+    ) {
+      return 1;
+    }
+
+    if (datePbA < datePbB) return -1;
+    if (datePbA > datePbB) return 1;
+
+    if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
+      return -1;
+    }
+    if (a.status !== Status.CERTIFICAAT && b.status === Status.CERTIFICAAT) {
+      return 1;
+    }
+    // if (b.status === Status.NIEUW && a.status !== Status.NIEUW) {
+    //   return 1;
+    // }
+
+    // if (a.status === Status.CERTIFICAAT && b.status !== Status.CERTIFICAAT) {
+    //   return 1;
+    // }
+    // if (b.status === Status.CERTIFICAAT && a.status !== Status.CERTIFICAAT) {
+    //   return -1;
+    // }
 
     if (dateTwA > dateTwB) return -1;
     if (dateTwA < dateTwB) return 1;
